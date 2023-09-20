@@ -34,7 +34,4 @@
    <FileRef
       location = "group:CoughTracking-IOS.xcodeproj">
    </FileRef>
-   <FileRef
-      location = "group:Pods/Pods.xcodeproj">
-   </FileRef>
 </Workspace>
