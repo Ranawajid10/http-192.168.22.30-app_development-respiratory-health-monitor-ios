@@ -17,7 +17,6 @@ struct BaselineView: View
     @StateObject private var baselineVM = BaselineVM()
     
     @State private var toast: FancyToast? = nil
-    @State  var goNext: Bool = false
     
     var body: some View{
         ZStack{
@@ -117,8 +116,7 @@ struct BaselineView: View
                             
                             if(baselineVM.gotSample){
                                 
-                                MyUserDefaults.saveBool(forKey:Constants.isBaseLineSet, value: true)
-                                goNext = true
+                                baselineVM.doLogin()
                                 
                             }else{
                                 
@@ -152,7 +150,7 @@ struct BaselineView: View
             
         }
         .environment(\.managedObjectContext,viewContext)
-        .navigationDestination(isPresented: $goNext, destination: {
+        .navigationDestination(isPresented: $baselineVM.goNext, destination: {
             
             DashboardView()
                 .environment(\.managedObjectContext,viewContext)
@@ -167,6 +165,15 @@ struct BaselineView: View
             if(i){
                 
                 toast = FancyToast(type: .error, title: "Error occurred!", message: baselineVM.errorMessage)
+                
+            }
+            
+            
+        }.onReceive(baselineVM.$gotSample) { i in
+            
+            if(i){
+                
+                toast = FancyToast(type: .success, title: "Success", message: "Cough sample detected successfully")
                 
             }
             

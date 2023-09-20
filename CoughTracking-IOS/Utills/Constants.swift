@@ -24,6 +24,7 @@ class Constants{
     static let isLoggedIn : String =  "isLoggedIn"
     static let isBaseLineSet : String =  "isBaseLineSet"
     static let baseLineLoudness : String =  "baseLineLoudness"
+    static let userData : String =  "userData"
     
     
     

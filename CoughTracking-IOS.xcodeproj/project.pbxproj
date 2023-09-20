@@ -62,6 +62,8 @@
 		F35ED3C42ABAD96D00E91289 /* final_model_weights_no_optimization_v3.tflite in Resources */ = {isa = PBXBuildFile; fileRef = F35ED3C32ABAD96D00E91289 /* final_model_weights_no_optimization_v3.tflite */; };
 		F35ED3C62ABAD98700E91289 /* segmented_final_model_weights_no_optimization.tflite in Resources */ = {isa = PBXBuildFile; fileRef = F35ED3C52ABAD98700E91289 /* segmented_final_model_weights_no_optimization.tflite */; };
 		F35ED3CD2ABAEFF500E91289 /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F35ED3CC2ABAEFF500E91289 /* Lato-Regular.ttf */; };
+		F35ED3CF2ABB0B1100E91289 /* VolunteerParticipationVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3CE2ABB0B1100E91289 /* VolunteerParticipationVM.swift */; };
+		F35ED3D12ABB205B00E91289 /* MyProfileVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3D02ABB205B00E91289 /* MyProfileVM.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -136,6 +138,8 @@
 		F35ED3C32ABAD96D00E91289 /* final_model_weights_no_optimization_v3.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = final_model_weights_no_optimization_v3.tflite; sourceTree = "<group>"; };
 		F35ED3C52ABAD98700E91289 /* segmented_final_model_weights_no_optimization.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = segmented_final_model_weights_no_optimization.tflite; sourceTree = "<group>"; };
 		F35ED3CC2ABAEFF500E91289 /* Lato-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Regular.ttf"; sourceTree = "<group>"; };
+		F35ED3CE2ABB0B1100E91289 /* VolunteerParticipationVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolunteerParticipationVM.swift; sourceTree = "<group>"; };
+		F35ED3D02ABB205B00E91289 /* MyProfileVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyProfileVM.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -206,12 +210,12 @@
 		F35ED31C2ABABCF200E91289 /* CoughTracking-IOS */ = {
 			isa = PBXGroup;
 			children = (
+				F35ED32D2ABABE7F00E91289 /* ApiManagement */,
+				F35ED32E2ABABE9A00E91289 /* Fonts */,
+				F35ED32F2ABABEB000E91289 /* InfoPList */,
+				F35ED3302ABABED400E91289 /* Models */,
 				F35ED3B82ABACAA600E91289 /* CoreData */,
 				F35ED3312ABABEE500E91289 /* ViewModels */,
-				F35ED3302ABABED400E91289 /* Models */,
-				F35ED32F2ABABEB000E91289 /* InfoPList */,
-				F35ED32E2ABABE9A00E91289 /* Fonts */,
-				F35ED32D2ABABE7F00E91289 /* ApiManagement */,
 				F35ED32C2ABABD6D00E91289 /* UIViews */,
 				F35ED32B2ABABD4900E91289 /* Utills */,
 				F35ED31D2ABABCF200E91289 /* CoughTracking_IOSApp.swift */,
@@ -303,6 +307,8 @@
 				F35ED3522ABAC20100E91289 /* DashboardVM.swift */,
 				F35ED3542ABAC21400E91289 /* BecomeVolunteerVM.swift */,
 				F35ED3562ABAC22B00E91289 /* BaselineVM.swift */,
+				F35ED3CE2ABB0B1100E91289 /* VolunteerParticipationVM.swift */,
+				F35ED3D02ABB205B00E91289 /* MyProfileVM.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -493,6 +499,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F35ED3CF2ABB0B1100E91289 /* VolunteerParticipationVM.swift in Sources */,
 				F35ED33B2ABABFC700E91289 /* MyUserDefaults.swift in Sources */,
 				F35ED37D2ABAC46C00E91289 /* DailyCoughsView.swift in Sources */,
 				F35ED3732ABAC3EB00E91289 /* ChangePasswordView.swift in Sources */,
@@ -523,6 +530,7 @@
 				F35ED3792ABAC44000E91289 /* WeeklyCoughsView.swift in Sources */,
 				F35ED3552ABAC21400E91289 /* BecomeVolunteerVM.swift in Sources */,
 				F35ED36B2ABAC37A00E91289 /* GetStartedView.swift in Sources */,
+				F35ED3D12ABB205B00E91289 /* MyProfileVM.swift in Sources */,
 				F35ED3652ABAC32B00E91289 /* NotesView.swift in Sources */,
 				F35ED35D2ABAC2C200E91289 /* UserReportView.swift in Sources */,
 				F35ED3432ABAC03D00E91289 /* Extensions.swift in Sources */,

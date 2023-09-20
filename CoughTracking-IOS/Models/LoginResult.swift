@@ -12,9 +12,9 @@ struct LoginResult: Codable {
 
   var statusCode        : Int?    = nil
   var detail            : String? = nil
-  var email             : String? = nil
+  var email             : String = ""
   var token             : String? = nil
-  var name              : String? = nil
+  var name              : String = ""
   var gender            : String? = nil
   var age               : Int?    = nil
   var medicalConditions : String? = nil
@@ -41,9 +41,9 @@ struct LoginResult: Codable {
 
     statusCode        = try values.decodeIfPresent(Int.self    , forKey: .statusCode        )
     detail            = try values.decodeIfPresent(String.self , forKey: .detail            )
-    email             = try values.decodeIfPresent(String.self , forKey: .email             )
+    email             = try values.decodeIfPresent(String.self , forKey: .email             ) ?? ""
     token             = try values.decodeIfPresent(String.self , forKey: .token             )
-    name              = try values.decodeIfPresent(String.self , forKey: .name              )
+    name              = try values.decodeIfPresent(String.self , forKey: .name              ) ?? ""
     gender            = try values.decodeIfPresent(String.self , forKey: .gender            )
     age               = try values.decodeIfPresent(Int.self    , forKey: .age               )
     medicalConditions = try values.decodeIfPresent(String.self , forKey: .medicalConditions )

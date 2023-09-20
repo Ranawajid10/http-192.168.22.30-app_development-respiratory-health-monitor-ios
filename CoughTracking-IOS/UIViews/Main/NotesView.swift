@@ -957,7 +957,7 @@ struct CoughsNotesView:View{
             print("Error setting up AVAudioSession: \(error.localizedDescription)")
         }
         
-        if let audioBuffer = convertToAudioBuffer(floatArray: cough.coughSegments ?? [], sampleRate: 22050) {
+        if let audioBuffer = Functions.convertToAudioBuffer(floatArray: cough.coughSegments ?? [], sampleRate: 22050) {
             
             audioPlayerManager.playAudio(buffer: audioBuffer)
             
@@ -965,22 +965,7 @@ struct CoughsNotesView:View{
         
         
         
-        func convertToAudioBuffer(floatArray: [[Float]], sampleRate: Double) -> AVAudioPCMBuffer? {
-            let format = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sampleRate, channels: 1, interleaved: false)
-            
-            let audioBuffer = AVAudioPCMBuffer(pcmFormat: format!, frameCapacity: AVAudioFrameCount(floatArray[0].count))
-            audioBuffer?.frameLength = AVAudioFrameCount(floatArray[0].count)
-            
-            if let buffer = audioBuffer {
-                let floatBuffer = buffer.floatChannelData![0]
-                for (index, sample) in floatArray[0].enumerated() {
-                    floatBuffer[index] = sample
-                }
-                return buffer
-            }
-            
-            return nil
-        }
+        
     }
     
 }

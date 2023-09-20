@@ -10,6 +10,7 @@ import AAInfographics
 
 struct DailyCoughsView: View {
     
+    @ObservedObject var dashboardVM:DashboardVM
     @Binding var totalCoughCount:Int
     @Binding var totalTrackedHours:Double
     @Binding var coughsPerHour:Int
@@ -27,6 +28,9 @@ struct DailyCoughsView: View {
     @State var sortedSevereTimeDataDictionary: [(key: String, value: Int)] = []
     
     @State var changeGraph:Int = 0
+    
+    @State var userData = LoginResult()
+    @Environment(\.managedObjectContext) private var viewContext
     
     var body: some View {
         ZStack {
@@ -87,7 +91,26 @@ struct DailyCoughsView: View {
                     
                     NavigationLink {
                         
-                        BecomeVolunteerView()
+                        if(userData.age==nil && userData.gender==nil && userData.ethnicity==nil){
+                         
+                            BecomeVolunteerView(dashboardVM: dashboardVM,allCoughList: $allCoughList)
+                                .environment(\.managedObjectContext, viewContext)
+                            
+                        }else{
+                            
+                            VolunteerParticipationView()
+                                .environment(\.managedObjectContext, viewContext)
+                                .onAppear{
+                                    
+                                    dashboardVM.stopRecording()
+                                    
+                                }.onDisappear{
+                                    
+                                    dashboardVM.startRecording()
+                                    
+                                }
+                            
+                        }
                         
                     } label: {
                         
@@ -95,12 +118,15 @@ struct DailyCoughsView: View {
                         Text("I want to volunteer")
                             .font(.system(size: 16))
                             .foregroundColor(Color.white)
+                            .frame(width: UIScreen.main.bounds.width-60,height: 42)
+                            .background(Color.appColorBlue)
+                            .cornerRadius(40)
                         
                         
-                    }.frame(width: UIScreen.main.bounds.width-60,height: 42)
-                        .background(Color.appColorBlue)
-                        .cornerRadius(40)
-                        .padding(.top)
+                    }.padding(.top)
+                    
+                    
+                    
                     
                     Spacer()
                     
@@ -112,6 +138,7 @@ struct DailyCoughsView: View {
             
         }).onAppear{
             
+            userData = MyUserDefaults.getUserData() ?? LoginResult()
             getGraphData()
             
         }.onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextObjectsDidChange)) { _ in

@@ -57,4 +57,43 @@ class MyUserDefaults{
         return UserDefaults.standard.float(forKey: key)
     }
     
+    // MARK: - User Data
+    
+    static func saveUserData<LoginResult: Codable>(value: LoginResult) {
+        do {
+            let encoder = JSONEncoder()
+            let encodedData = try encoder.encode(value)
+            UserDefaults.standard.set(encodedData, forKey: Constants.userData)
+        } catch {
+            print("Error saving Codable object: \(error.localizedDescription)")
+        }
+    }
+    
+    static func getUserData<LoginResult: Codable>() -> LoginResult? {
+        if let encodedData = UserDefaults.standard.data(forKey: Constants.userData) {
+            do {
+                let decoder = JSONDecoder()
+                return try decoder.decode(LoginResult.self, from: encodedData)
+            } catch {
+                print("Error retrieving Codable object: \(error.localizedDescription)")
+            }
+        }
+        return nil
+    }
+    
+    // MARK: - Remove User Data
+    
+    static func removeUserData(forKey key: String) {
+        UserDefaults.standard.removeObject(forKey: key)
+    }
+    
+    
+    // MARK: - Get Bearer Yoken
+    
+    static func getBearerToken() -> String {
+        
+        var userData = getUserData() ?? LoginResult()
+        return userData.token ?? ""
+    }
+    
 }

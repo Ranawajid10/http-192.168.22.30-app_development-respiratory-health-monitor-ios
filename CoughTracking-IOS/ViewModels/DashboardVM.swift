@@ -29,7 +29,7 @@ class DashboardVM:ObservableObject{
     
     private var recordingStartTime: Date?
     
-    @Published var totalHoursRecordedToday: Double = 0.0
+    @Published var totalSecondsRecordedToday: Double = 0.0
     
     
     func startRecording(){
@@ -91,10 +91,10 @@ class DashboardVM:ObservableObject{
             if let recordingStartTime = recordingStartTime {
                 let recordingEndTime = Date()
                 let durationInSeconds = recordingEndTime.timeIntervalSince(recordingStartTime)
-                let durationInHours = durationInSeconds / 3600.0 // 3600 seconds in an hour
+//                let durationInHours = durationInSeconds / 3600.0 // 3600 seconds in an hour
                 
                 // Increment the total hours recorded today
-                totalHoursRecordedToday += durationInHours
+                totalSecondsRecordedToday = durationInSeconds
                 
             }
             

@@ -9,9 +9,11 @@ import SwiftUI
 
 struct BecomeVolunteerView: View {
     
+    @ObservedObject var dashboardVM:DashboardVM
+    @Binding var allCoughList:[Cough]
     @ObservedObject var becomeVolunteerVM = BecomeVolunteerVM()
     @State private var toast: FancyToast? = nil
-    
+    @Environment(\.managedObjectContext) private var viewContext
     
     var body: some View {
         ZStack {
@@ -56,7 +58,7 @@ struct BecomeVolunteerView: View {
                             
                         }.padding(.top)
                         
-                        DisclosureGroup(becomeVolunteerVM.genderDGText, isExpanded: $becomeVolunteerVM.isGenderExpended) {
+                        DisclosureGroup(becomeVolunteerVM.gender, isExpanded: $becomeVolunteerVM.isGenderExpended) {
                             
                             ForEach(0..<Constants.genderList.count,id: \.self){ index in
                                 
@@ -65,7 +67,7 @@ struct BecomeVolunteerView: View {
                                     Button {
                                         
                                         withAnimation {
-                                            becomeVolunteerVM.genderDGText = Constants.genderList[index]
+                                            becomeVolunteerVM.gender = Constants.genderList[index]
                                             becomeVolunteerVM.selectedGenderIndex = index
                                             becomeVolunteerVM.isGenderExpended.toggle()
                                         }
@@ -91,21 +93,16 @@ struct BecomeVolunteerView: View {
                         }.foregroundColor(.black)
                             .modifier(LatoFontModifier(fontWeight: .regular, fontSize: 16))
                             .padding(.top,2)
-                            .background(Color.white)
                             .cornerRadius(8)
-                            .padding(.top)
                             .onAppear{
                                 
                                 if(becomeVolunteerVM.selectedGenderIndex == -1){
                                     
-                                    becomeVolunteerVM.genderDGText = "Enter gender"
+                                    becomeVolunteerVM.gender = "Enter gender"
                                     
                                 }
                                 
                             }
-                        
-                        //                        TextField("Enter gender", text: $becomeVolunteerVM.gender)
-                        //                            .padding(.top,2)
                         
                         Color.gray
                             .frame(height: 1)
@@ -159,21 +156,17 @@ struct BecomeVolunteerView: View {
                         }.foregroundColor(.black)
                             .modifier(LatoFontModifier(fontWeight: .regular, fontSize: 16))
                             .padding(.top,2)
-                            .background(Color.white)
                             .cornerRadius(8)
-                            .padding(.top)
                             .onAppear{
                                 
                                 if(becomeVolunteerVM.selectedEthncityIndex == -1){
                                     
-                                    becomeVolunteerVM.ethncity = "Enter gender"
+                                    becomeVolunteerVM.ethncity = "Enter ethncity"
                                     
                                 }
                                 
                             }
                         
-//                        TextField("Enter ethncity", text: $becomeVolunteerVM.ethncity)
-//                            .padding(.top,2)
                         
                         Color.gray
                             .frame(height: 1)
@@ -227,20 +220,57 @@ struct BecomeVolunteerView: View {
                 
             }
             
+            
+            if(becomeVolunteerVM.isLoading){
+                
+                LoadingView()
+                
+            }
+            
         }.toastView(toast: $toast)
             .dismissKeyboardOnTap()
             .navigationTitle("Volunteer Participation")
+            .onReceive(becomeVolunteerVM.$isGenderExpended, perform: { i in
+                
+                if(i){
+                    
+                    UIApplication.shared.endEditing()
+                    
+                }
+                    
+                
+            })
+            .onReceive(becomeVolunteerVM.$isEthncityExpended, perform: { i in
+                
+                if(i){
+                    
+                    UIApplication.shared.endEditing()
+                    
+                }
+                    
+                
+            })
             .onChange(of: becomeVolunteerVM.isError){ newValue in
                 
                 if(newValue){
                     
                     toast = FancyToast(type: .error, title: "Error occurred!", message: becomeVolunteerVM.errorMessage)
-                    
+                    becomeVolunteerVM.isError = false
                 }
                 
             }.navigationDestination(isPresented: $becomeVolunteerVM.goNext) {
                 
                 VolunteerParticipationView()
+                    .environment(\.managedObjectContext, viewContext)
+                    .onAppear{
+                        
+                        dashboardVM.stopRecording()
+                        
+                    }.onDisappear{
+                        
+                        dashboardVM.startRecording()
+                        
+                    }
                 
             }.toolbar{
                 
@@ -257,9 +287,9 @@ struct BecomeVolunteerView: View {
             }
     }
 }
-
-struct BecomeVolunteerView_Previews: PreviewProvider {
-    static var previews: some View {
-        BecomeVolunteerView()
-    }
-}
+//
+//struct BecomeVolunteerView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        BecomeVolunteerView()
+//    }
+//}

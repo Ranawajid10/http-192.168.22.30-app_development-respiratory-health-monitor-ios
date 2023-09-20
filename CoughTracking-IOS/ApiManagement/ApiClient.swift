@@ -13,11 +13,16 @@ class ApiClient {
     static let shared = ApiClient()
     let baseUrl = "https://coughdairy.ai4lyf.com/"
     
-    var headers: HTTPHeaders = [
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            ]
+    var simpleHeaders: HTTPHeaders = [
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    ]
     
+    var tokenHeaders: HTTPHeaders = [
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": "Bearer \(MyUserDefaults.getBearerToken())"
+    ]
     
     
     func sendOTP(email:String,fcm:String, completion: @escaping (Result<SendOtpResult, ErrorResult>) -> Void){
@@ -28,30 +33,30 @@ class ApiClient {
             "email": email,
             "guid" : fcm ]
         
-
-        AF.request(url,method: .post,parameters: params,encoding: JSONEncoding.default,headers: headers)
-            .responseDecodable(of:SendOtpResult.self){ response in
         
-            switch response.result{
-
-            case.success(let data):
-                completion(.success(data))
-                break
-            case.failure(let error):
+        AF.request(url,method: .post,parameters: params,encoding: JSONEncoding.default,headers: simpleHeaders)
+            .responseDecodable(of:SendOtpResult.self){ response in
                 
-                var apiError = ApiError()
-                apiError.msg = error.localizedDescription
+                switch response.result{
+                    
+                case.success(let data):
+                    completion(.success(data))
+                    break
+                case.failure(let error):
+                    
+                    var apiError = ApiError()
+                    apiError.msg = error.localizedDescription
+                    
+                    var errorResult = ErrorResult()
+                    errorResult.detail = [apiError]
+                    
+                    completion(.failure(errorResult))
+                    break
+                    
+                }
                 
-                var errorResult = ErrorResult()
-                errorResult.detail = [apiError]
                 
-                completion(.failure(errorResult))
-                break
-
             }
-            
-            
-        }
         
     }
     
@@ -63,30 +68,30 @@ class ApiClient {
             "email": email,
             "otp" : otp ] as [String : Any]
         
-
-        AF.request(url,method: .post,parameters: params,encoding: JSONEncoding.default,headers: headers)
-            .responseDecodable(of:LoginResult.self){ response in
         
-            switch response.result{
-
-            case.success(let data):
-                completion(.success(data))
-                break
-            case.failure(let error):
+        AF.request(url,method: .post,parameters: params,encoding: JSONEncoding.default,headers: simpleHeaders)
+            .responseDecodable(of:LoginResult.self){ response in
                 
-                var apiError = ApiError()
-                apiError.msg = error.localizedDescription
+                switch response.result{
+                    
+                case.success(let data):
+                    completion(.success(data))
+                    break
+                case.failure(let error):
+                    
+                    var apiError = ApiError()
+                    apiError.msg = error.localizedDescription
+                    
+                    var errorResult = ErrorResult()
+                    errorResult.detail = [apiError]
+                    
+                    completion(.failure(errorResult))
+                    break
+                    
+                }
                 
-                var errorResult = ErrorResult()
-                errorResult.detail = [apiError]
                 
-                completion(.failure(errorResult))
-                break
-
             }
-            
-            
-        }
         
     }
     
@@ -102,43 +107,79 @@ class ApiClient {
             "medical_condition" : medicalCondition
         ] as [String : Any]
         
-
-        AF.request(url,method: .post,parameters: params,encoding: JSONEncoding.default,headers: headers)
-            .responseDecodable(of:SendOtpResult.self){ response in
         
-            switch response.result{
-
-            case.success(let data):
-                completion(.success(data))
-                break
-            case.failure(let error):
+        AF.request(url,method: .post,parameters: params,encoding: JSONEncoding.default,headers: tokenHeaders)
+            .responseDecodable(of:SendOtpResult.self){ response in
                 
-                var apiError = ApiError()
-                apiError.msg = error.localizedDescription
+                switch response.result{
+                    
+                case.success(let data):
+                    completion(.success(data))
+                    break
+                case.failure(let error):
+                    
+                    var apiError = ApiError()
+                    apiError.msg = error.localizedDescription
+                    
+                    var errorResult = ErrorResult()
+                    errorResult.detail = [apiError]
+                    
+                    completion(.failure(errorResult))
+                    break
+                    
+                }
                 
-                var errorResult = ErrorResult()
-                errorResult.detail = [apiError]
                 
-                completion(.failure(errorResult))
-                break
-
             }
-            
-            
-        }
         
     }
     
-    //    func loginWithEmailPwd(email:String,pwd:String, completion: @escaping(Result<String,ErrorResult>) -> Void){
-    //
-    //        let url = baseUrl + "user/login"
-    //
-    ////        AF.request(<#T##convertible: URLConvertible##URLConvertible#>)
-    //
-    //
-    //    }
+    
+    func updateProfile(name:String, completion: @escaping (Result<SendOtpResult, ErrorResult>) -> Void){
+        
+        let url = baseUrl + "info/profile"
+        
+        
+        let params = [
+            "name": name,
+            "file": ""
+        ] as [String : Any]
+        
+        
+        AF.request(url,method: .post,parameters: params,encoding: JSONEncoding.default,headers: tokenHeaders)
+            .responseJSON{ response in
+                
+                print(response)
+//                switch response.result{
+//
+//                case.success(let data):
+//                    completion(.success(data))
+//                    break
+//                case.failure(let error):
+//
+//                    var apiError = ApiError()
+//                    apiError.msg = error.localizedDescription
+//
+//                    var errorResult = ErrorResult()
+//                    errorResult.detail = [apiError]
+//
+//                    completion(.failure(errorResult))
+//                    break
+//
+//                }
+//
+                
+            }
+        
+    }
     
     
+    func uploadSamples(allCoughList:[VolunteerCough], completion: @escaping (Result<SendOtpResult, ErrorResult>) -> Void){
+        
+        let url = baseUrl + "donate/recording"
+        
+        
+    }
     
     
 }

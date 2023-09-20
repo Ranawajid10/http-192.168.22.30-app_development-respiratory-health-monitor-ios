@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreData
+import AVFoundation
 
 
 class Functions{
@@ -24,6 +25,23 @@ class Functions{
         formatter.dateFormat = "HH:mm"
         let date = Date(timeIntervalSince1970: TimeInterval(hour * 3600)) // Convert hours to seconds
         return formatter.string(from: date)
+    }
+    
+    static func convertToAudioBuffer(floatArray: [[Float]], sampleRate: Double) -> AVAudioPCMBuffer? {
+        let format = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sampleRate, channels: 1, interleaved: false)
+        
+        let audioBuffer = AVAudioPCMBuffer(pcmFormat: format!, frameCapacity: AVAudioFrameCount(floatArray[0].count))
+        audioBuffer?.frameLength = AVAudioFrameCount(floatArray[0].count)
+        
+        if let buffer = audioBuffer {
+            let floatBuffer = buffer.floatChannelData![0]
+            for (index, sample) in floatArray[0].enumerated() {
+                floatBuffer[index] = sample
+            }
+            return buffer
+        }
+        
+        return nil
     }
     
 }

@@ -19,6 +19,7 @@ import Combine
 
 class BaselineVM:ObservableObject{
     
+    @Published var goNext = false
     @Published var isLoading = false
     @Published var isError = false
     @Published var errorMessage = ""
@@ -64,9 +65,11 @@ class BaselineVM:ObservableObject{
                 }else if(success.statusCode == 201 || success.statusCode == 200){
                     
                     //Logged In Successfully
+                    MyUserDefaults.saveUserData(value: success)
                     MyUserDefaults.saveFloat(forKey: Constants.baseLineLoudness, value: maxLoudness)
-                    gotSample = true
+                    MyUserDefaults.saveBool(forKey:Constants.isBaseLineSet, value: true)
                     isError = false
+                    goNext = true
                     
                 }
                 
@@ -240,23 +243,13 @@ class BaselineVM:ObservableObject{
             let fs = Float(audioFile.fileFormat.sampleRate)
             
             
-            
-            //            PythonFunctions.coughSegmentInference(audioData: x, fs: fs ,buffer:buffer!)
             (segments, _) = PythonFunctions.coughSegmentInference(audioData: x, fs: fs ,buffer:buffer!)
             
-            //            var counter = 0
-            //            for s in segments {
-            //
-            //                try saveWAVFileToDocumentsDirectory(floatArray: s, sampleRate: 22050, fileName: "my_new"+String(counter)+".wav")
-            //                counter+=1
-            //            }
-            print("sa",segments.count)
             
             if(segments.count > 0){
                 
-                //                let maxLoudness = PythonFunctions.computeMaxSegmentEnergy(segments: segments, fs: fs)
                 maxLoudness = loudnessBasedAdaptive(segments: segments, buffer: buffer! )
-                doLogin()
+                gotSample = true
                 
             }else{
                 
@@ -267,8 +260,6 @@ class BaselineVM:ObservableObject{
                 
                 
             }
-            
-            //            print(segments)
             
         } catch {
             
@@ -287,15 +278,6 @@ class BaselineVM:ObservableObject{
         let maxLoudness = segments.map { PythonFunctions.powerByAVFoundation($0, sampleRate, buffer: buffer) }.max() ?? 0.0
         return maxLoudness
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     func saveWAVFileToDocumentsDirectory(floatArray: [Float], sampleRate: Double, fileName: String) throws -> URL {

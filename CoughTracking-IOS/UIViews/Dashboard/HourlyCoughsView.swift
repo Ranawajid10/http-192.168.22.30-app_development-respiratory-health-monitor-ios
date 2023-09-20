@@ -12,6 +12,7 @@ import Combine
 
 struct HourlyCoughsView: View {
     
+    @ObservedObject var dashboardVM:DashboardVM
     @Binding var totalCoughCount:Int
     @Binding var totalTrackedHours:Double
     @Binding var coughsPerHour:Int
@@ -31,7 +32,8 @@ struct HourlyCoughsView: View {
     @State var sortedSevereTimeDataDictionary: [(key: String, value: Int)] = []
     
     @State var changeGraph:Int = 0
-//    @State var totalCoughCount:Int = 0
+    
+    @State var userData = LoginResult()
     
     let array = ["05:00", "10:00", "15:00", "20:00", "25:00", "30:00",
                  "35:00", "40:00", "45:00", "50:00", "55:00", "60:00"]
@@ -100,7 +102,26 @@ struct HourlyCoughsView: View {
                     
                     NavigationLink {
                         
-                        BecomeVolunteerView()
+                        if(userData.age==nil && userData.gender==nil && userData.ethnicity==nil){
+                         
+                            BecomeVolunteerView(dashboardVM: dashboardVM, allCoughList: $allCoughList)
+                                .environment(\.managedObjectContext, viewContext)
+                            
+                        }else{
+                            
+                            VolunteerParticipationView()
+                                .environment(\.managedObjectContext, viewContext)
+                                .onAppear{
+                                    
+                                    dashboardVM.stopRecording()
+                                    
+                                }.onDisappear{
+                                    
+                                    dashboardVM.startRecording()
+                                    
+                                }
+                            
+                        }
                         
                     } label: {
                         
@@ -108,12 +129,13 @@ struct HourlyCoughsView: View {
                         Text("I want to volunteer")
                             .font(.system(size: 16))
                             .foregroundColor(Color.white)
+                            .frame(width: UIScreen.main.bounds.width-60,height: 42)
+                            .background(Color.appColorBlue)
+                            .cornerRadius(40)
                         
                         
-                    }.frame(width: UIScreen.main.bounds.width-60,height: 42)
-                        .background(Color.appColorBlue)
-                        .cornerRadius(40)
-                        .padding(.top)
+                    }.padding(.top)
+                    
                     
                     Spacer()
                     
@@ -130,7 +152,7 @@ struct HourlyCoughsView: View {
             
         }).onAppear{
             
-            print("audio",allCoughList.count)
+            userData = MyUserDefaults.getUserData() ?? LoginResult()
             getGraphData()
             
         }.onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextObjectsDidChange)) { _ in

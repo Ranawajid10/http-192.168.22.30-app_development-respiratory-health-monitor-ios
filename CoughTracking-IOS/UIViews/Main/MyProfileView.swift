@@ -9,14 +9,10 @@ import SwiftUI
 
 struct MyProfileView: View {
     
-    @State var fullName:String = ""
-    @State var email:String = ""
-    @State var password:String = ""
     
     
-    @State var isEditAble = false
-    
-    
+    @ObservedObject var myProfileVM = MyProfileVM()
+  
     
     var body: some View {
         
@@ -61,9 +57,9 @@ struct MyProfileView: View {
                             
                         }.padding(.top)
                         
-                        TextField("Full Name", text: $fullName)
+                        TextField("Full Name", text: $myProfileVM.userData.name)
                             .padding(.top,2)
-                            .disabled(!isEditAble)
+                            .disabled(!myProfileVM.isEditAble)
                         
                         Color.gray
                             .frame(height: 1)
@@ -81,67 +77,75 @@ struct MyProfileView: View {
                             
                         }.padding(.top)
                         
-                        TextField("Enter email", text: $email)
+                        TextField("Enter email", text: $myProfileVM.userData.email)
                             .padding(.top,2)
-                            .disabled(!isEditAble)
+                            .disabled(true)
                         
                         Color.gray
                             .frame(height: 1)
                         
                     }
                     
-                    Group{
-                        HStack{
-                            
-                            Text("Password")
-                                .foregroundColor(.gray)
-                                .modifier(LatoFontModifier(fontWeight: .regular, fontSize: 16))
-                            
-                            Spacer()
-                            
-                        }.padding(.top)
-                        
-                        HStack{
-                            
-                            TextField("Enter password", text: $password)
-                                .padding(.top,2)
-                                .disabled(!isEditAble)
-                            
-                            NavigationLink {
-                                
-                                ChangePasswordView()
-                                
-                            } label: {
-                                
-                                Text("Change")
-                                    .foregroundColor(.appColorBlue)
-                                    .modifier(LatoFontModifier(fontWeight: .regular, fontSize: 14))
-                                    .underline()
-                                
-                            }
-                            
-                            
-                        }
-                        
-                        Color.gray
-                            .frame(height: 1)
-                        
-                        
-                    }
+//                    Group{
+//                        HStack{
+//
+//                            Text("Password")
+//                                .foregroundColor(.gray)
+//                                .modifier(LatoFontModifier(fontWeight: .regular, fontSize: 16))
+//
+//                            Spacer()
+//
+//                        }.padding(.top)
+//
+//                        HStack{
+//
+//                            TextField("Enter password", text: $password)
+//                                .padding(.top,2)
+//                                .disabled(!isEditAble)
+//
+//                            NavigationLink {
+//
+//                                ChangePasswordView()
+//
+//                            } label: {
+//
+//                                Text("Change")
+//                                    .foregroundColor(.appColorBlue)
+//                                    .modifier(LatoFontModifier(fontWeight: .regular, fontSize: 14))
+//                                    .underline()
+//
+//                            }
+//
+//
+//                        }
+//
+//                        Color.gray
+//                            .frame(height: 1)
+//
+//
+//                    }
                     
                     
                     Button {
                         
-                        withAnimation {
+                        if(myProfileVM.isEditAble){
                             
-                            isEditAble.toggle()
+                            myProfileVM.updateProfile()
+                            
+                        }else{
+                            
+                            withAnimation {
+                                
+                                myProfileVM.isEditAble.toggle()
+                                
+                            }
                             
                         }
                         
                     } label: {
                         
                         
-                        Text(isEditAble == true ? "Save" : "Edit" )
+                        Text(myProfileVM.isEditAble == true ? "Save" : "Edit" )
                             .font(.system(size: 16))
                             .foregroundColor(Color.white)
                         
@@ -153,6 +157,13 @@ struct MyProfileView: View {
                     
                 }.padding(.horizontal)
             }
+            
+            if(myProfileVM.isLoading){
+                
+                LoadingView()
+                
+            }
+            
         }.background(Color.screenBG)
     }
 }

@@ -17,6 +17,6 @@ extension CoughTrackingHours {
     }
 
     @NSManaged public var date: String?
-    @NSManaged public var hoursTrack: Double
+    @NSManaged public var secondsTrack: Double
 
 }

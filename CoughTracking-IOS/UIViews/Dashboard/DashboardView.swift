@@ -68,18 +68,20 @@ struct DashboardView: View {
                 Group{
                     if selectedDayIndex == 0 {
                         
-                        HourlyCoughsView(totalCoughCount: $totalCoughCount, totalTrackedHours: $totalTrackedHours, coughsPerHour: $coughsPerHour, allCoughList: $allCoughList)
+                        HourlyCoughsView(dashboardVM: dashboardVM,totalCoughCount: $totalCoughCount, totalTrackedHours: $totalTrackedHours, coughsPerHour: $coughsPerHour, allCoughList: $allCoughList)
                             .environment(\.managedObjectContext, viewContext)
                             .id(1)
                         
                     } else if selectedDayIndex == 1 {
                         
-                        DailyCoughsView(totalCoughCount: $totalCoughCount, totalTrackedHours: $totalTrackedHours, coughsPerHour: $coughsPerHour, allCoughList: $allCoughList)
+                        DailyCoughsView(dashboardVM: dashboardVM,totalCoughCount: $totalCoughCount, totalTrackedHours: $totalTrackedHours, coughsPerHour: $coughsPerHour, allCoughList: $allCoughList)
+                            .environment(\.managedObjectContext, viewContext)
                             .id(2)
                         
                     } else {
                         
-                        WeeklyCoughsView(totalCoughCount: $totalCoughCount, totalTrackedHours: $totalTrackedHours, coughsPerHour: $coughsPerHour)
+                        WeeklyCoughsView(dashboardVM: dashboardVM,totalCoughCount: $totalCoughCount, totalTrackedHours: $totalTrackedHours, coughsPerHour: $coughsPerHour, allCoughList: $allCoughList)
+                            .environment(\.managedObjectContext, viewContext)
                             .id(3)
                     }
                     
@@ -146,7 +148,7 @@ struct DashboardView: View {
                 
                 if(i){
                     
-                    saveCough()
+                    saveSimpleCough()
                     
                 }
                 
@@ -175,12 +177,10 @@ struct DashboardView: View {
         totalTrackedHours = 0
         coughsPerHour = 0
         
-        for trackingHours in coughTrackingHoursFetchResult {
-            
-            let hour = trackingHours.hoursTrack
-            totalTrackedHours += hour
-            
-        }
+        
+        let totalSeconds = coughTrackingHoursFetchResult.reduce(0) { $0 + $1.secondsTrack }
+        
+        totalTrackedHours =  totalSeconds/3600.0
         
         print("fff",totalTrackedHours,"------",coughTrackingHoursFetchResult.count)
         
@@ -195,7 +195,7 @@ struct DashboardView: View {
         }
     }
     
-    func saveCough(){
+    func saveSimpleCough(){
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
@@ -220,8 +220,47 @@ struct DashboardView: View {
         cough.coughPower = dashboardVM.coughPower
         
         do {
+            
             try viewContext.save()
-            print("saved")
+            print("coredata","saved simple cough")
+            
+            saveVolunteerCough()
+            
+            
+        } catch {
+            // Handle the error
+            print("Error saving data: \(error.localizedDescription)")
+        }
+        
+    }
+    
+    func saveVolunteerCough(){
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        
+        let currentDate = Date()
+        
+        let dateString = dateFormatter.string(from: currentDate)
+        
+        
+        dateFormatter.dateFormat = "HH:mm:ss"
+        
+        let timeString = dateFormatter.string(from: currentDate)
+        
+        
+        let volunteerCough = VolunteerCough(context: viewContext)
+        
+        volunteerCough.id = DateUtills.getCurrentTimeInMilliseconds()
+        volunteerCough.date = dateString
+        volunteerCough.time = timeString
+        volunteerCough.coughSegments = dashboardVM.segments
+        volunteerCough.coughPower = dashboardVM.coughPower
+        
+        do {
+            try viewContext.save()
+            print("coredata","saved volunteer cough")
             
             dashboardVM.segments = []
             dashboardVM.coughPower = ""
@@ -232,8 +271,8 @@ struct DashboardView: View {
             print("Error saving data: \(error.localizedDescription)")
         }
         
+        
     }
-    
     
     func saveTrackedHours(){
         
@@ -250,7 +289,7 @@ struct DashboardView: View {
         
         
         coughTrackingHours.date = dateString
-        coughTrackingHours.hoursTrack = dashboardVM.totalHoursRecordedToday
+        coughTrackingHours.secondsTrack = dashboardVM.totalSecondsRecordedToday
         
         do {
             
@@ -783,7 +822,7 @@ struct SyncDataBottomSheet:View{
             
             NavigationLink {
                 
-                BecomeVolunteerView()
+               
                 
             } label: {
                 

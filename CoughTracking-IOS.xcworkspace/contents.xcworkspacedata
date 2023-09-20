@@ -2,6 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:CoughTracking-IOS/CoreData/VolunteerCough+CoreDataClass.swift">
+   </FileRef>
+   <FileRef
+      location = "group:CoughTracking-IOS/CoreData/VolunteerCough+CoreDataProperties.swift">
+   </FileRef>
+   <FileRef
       location = "group:CoughTracking-IOS/CoreData/CoughEntity+CoreDataClass.swift">
    </FileRef>
    <FileRef

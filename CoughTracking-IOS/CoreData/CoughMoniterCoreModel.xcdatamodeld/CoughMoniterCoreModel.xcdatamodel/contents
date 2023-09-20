@@ -17,12 +17,19 @@
     </entity>
     <entity name="CoughTrackingHours" representedClassName="CoughTrackingHours" syncable="YES" codeGenerationType="class">
         <attribute name="date" optional="YES" attributeType="String"/>
-        <attribute name="hoursTrack" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="secondsTrack" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
     </entity>
     <entity name="Notes" representedClassName="Notes" syncable="YES" codeGenerationType="class">
         <attribute name="date" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="String"/>
         <attribute name="note" optional="YES" attributeType="String"/>
+        <attribute name="time" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="VolunteerCough" representedClassName="VolunteerCough" syncable="YES" codeGenerationType="class">
+        <attribute name="coughPower" optional="YES" attributeType="String"/>
+        <attribute name="coughSegments" optional="YES" attributeType="Transformable" valueTransformerName="MyCustomTransformer" customClassName="[[Float]]"/>
+        <attribute name="date" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
         <attribute name="time" optional="YES" attributeType="String"/>
     </entity>
 </model>

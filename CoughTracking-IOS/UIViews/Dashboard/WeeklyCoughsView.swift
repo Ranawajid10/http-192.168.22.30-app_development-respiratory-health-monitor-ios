@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct WeeklyCoughsView: View {
-   
+    
+    @ObservedObject var dashboardVM:DashboardVM
     @Binding var totalCoughCount:Int
     @Binding var totalTrackedHours:Double
     @Binding var coughsPerHour:Int
+    @Binding var allCoughList:[Cough]
     
     @State private var selectedDate = Date()
     
@@ -21,6 +23,9 @@ struct WeeklyCoughsView: View {
     @State var sortedModerateTimeDataDictionary: [(key: String, value: Int)]  = []
     @State var sortedSevereTimeDataDictionary: [(key: String, value: Int)] = []
     
+    @State var userData = LoginResult()
+    
+    @Environment(\.managedObjectContext) private var viewContext
     
     var body: some View {
         ZStack {
@@ -31,7 +36,7 @@ struct WeeklyCoughsView: View {
                     DaySelectionView(selectedDate: $selectedDate)
                     
                     HourlyReportView(totalCoughCount: $totalCoughCount, totalTrackedHours: $totalTrackedHours, coughsPerHour: $coughsPerHour)
-                   
+                    
                     
                     HourlyCoughGraph()
                     
@@ -80,7 +85,26 @@ struct WeeklyCoughsView: View {
                     
                     NavigationLink {
                         
-                        BecomeVolunteerView()
+                        if(userData.age==nil && userData.gender==nil && userData.ethnicity==nil){
+                         
+                            BecomeVolunteerView(dashboardVM: dashboardVM, allCoughList: $allCoughList)
+                                .environment(\.managedObjectContext, viewContext)
+                            
+                        }else{
+                            
+                            VolunteerParticipationView()
+                                .environment(\.managedObjectContext, viewContext)
+                                .onAppear{
+                                    
+                                    dashboardVM.stopRecording()
+                                    
+                                }.onDisappear{
+                                    
+                                    dashboardVM.startRecording()
+                                    
+                                }
+                            
+                        }
                         
                     } label: {
                         
@@ -88,17 +112,21 @@ struct WeeklyCoughsView: View {
                         Text("I want to volunteer")
                             .font(.system(size: 16))
                             .foregroundColor(Color.white)
+                            .frame(width: UIScreen.main.bounds.width-60,height: 42)
+                            .background(Color.appColorBlue)
+                            .cornerRadius(40)
                         
                         
-                    }.frame(width: UIScreen.main.bounds.width-60,height: 42)
-                        .background(Color.appColorBlue)
-                        .cornerRadius(40)
-                        .padding(.top)
+                    }.padding(.top)
                     
                     Spacer()
                     
                 }
             }
+        }.onAppear{
+            
+            userData = MyUserDefaults.getUserData() ?? LoginResult()
+            
         }
     }
 }
