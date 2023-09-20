@@ -63,8 +63,26 @@
 		F35ED3C62ABAD98700E91289 /* segmented_final_model_weights_no_optimization.tflite in Resources */ = {isa = PBXBuildFile; fileRef = F35ED3C52ABAD98700E91289 /* segmented_final_model_weights_no_optimization.tflite */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		778CD5A52ABAE49300BAC392 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 778CD59F2ABAE49300BAC392 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 0479B63A4AFD4CA434670E85D1C3F5DB;
+			remoteInfo = "Pods-CoughTracking-IOS";
+		};
+		778CD5A72ABAE49300BAC392 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 778CD59F2ABAE49300BAC392 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E0B71FE13AA6B05010059EB4B8D87919;
+			remoteInfo = TensorFlowLiteSwift;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		5D19EEABF8D1AA348843A098 /* Pods_CoughTracking_IOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CoughTracking_IOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		778CD59F2ABAE49300BAC392 /* Pods.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Pods.xcodeproj; path = Pods/Pods.xcodeproj; sourceTree = "<group>"; };
 		9AA51B4555C52FBD690B3A13 /* Pods-CoughTracking-IOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CoughTracking-IOS.debug.xcconfig"; path = "Target Support Files/Pods-CoughTracking-IOS/Pods-CoughTracking-IOS.debug.xcconfig"; sourceTree = "<group>"; };
 		B852408408A03C921EA50DBD /* Pods-CoughTracking-IOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CoughTracking-IOS.release.xcconfig"; path = "Target Support Files/Pods-CoughTracking-IOS/Pods-CoughTracking-IOS.release.xcconfig"; sourceTree = "<group>"; };
 		F35ED31A2ABABCF200E91289 /* CoughTracking-IOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CoughTracking-IOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -136,6 +154,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		778CD5A02ABAE49300BAC392 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				778CD5A62ABAE49300BAC392 /* Pods-CoughTracking-IOS */,
+				778CD5A82ABAE49300BAC392 /* TensorFlowLiteSwift */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		AAFBC96411247345FC9FC7D0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -156,6 +183,7 @@
 		F35ED3112ABABCF200E91289 = {
 			isa = PBXGroup;
 			children = (
+				778CD59F2ABAE49300BAC392 /* Pods.xcodeproj */,
 				F35ED3C52ABAD98700E91289 /* segmented_final_model_weights_no_optimization.tflite */,
 				F35ED3C32ABAD96D00E91289 /* final_model_weights_no_optimization_v3.tflite */,
 				F35ED31C2ABABCF200E91289 /* CoughTracking-IOS */,
@@ -384,12 +412,37 @@
 			);
 			productRefGroup = F35ED31B2ABABCF200E91289 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 778CD5A02ABAE49300BAC392 /* Products */;
+					ProjectRef = 778CD59F2ABAE49300BAC392 /* Pods.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				F35ED3192ABABCF200E91289 /* CoughTracking-IOS */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		778CD5A62ABAE49300BAC392 /* Pods-CoughTracking-IOS */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			name = "Pods-CoughTracking-IOS";
+			path = Pods_CoughTracking_IOS.framework;
+			remoteRef = 778CD5A52ABAE49300BAC392 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		778CD5A82ABAE49300BAC392 /* TensorFlowLiteSwift */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			name = TensorFlowLiteSwift;
+			path = TensorFlowLite.framework;
+			remoteRef = 778CD5A72ABAE49300BAC392 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		F35ED3182ABABCF200E91289 /* Resources */ = {
