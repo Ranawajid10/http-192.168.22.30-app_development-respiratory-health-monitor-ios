@@ -1,0 +1,780 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		C06522C317DF6DF9DC6F76D3 /* Pods_CoughTracking_IOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D19EEABF8D1AA348843A098 /* Pods_CoughTracking_IOS.framework */; };
+		F35ED31E2ABABCF200E91289 /* CoughTracking_IOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED31D2ABABCF200E91289 /* CoughTracking_IOSApp.swift */; };
+		F35ED3222ABABCF400E91289 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F35ED3212ABABCF400E91289 /* Assets.xcassets */; };
+		F35ED3252ABABCF400E91289 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F35ED3242ABABCF400E91289 /* Preview Assets.xcassets */; };
+		F35ED3332ABABF3600E91289 /* Shapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3322ABABF3600E91289 /* Shapes.swift */; };
+		F35ED3352ABABF6800E91289 /* PythonFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3342ABABF6800E91289 /* PythonFunctions.swift */; };
+		F35ED3372ABABF9300E91289 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3362ABABF9300E91289 /* PersistenceController.swift */; };
+		F35ED3392ABABFAE00E91289 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3382ABABFAE00E91289 /* NetworkManager.swift */; };
+		F35ED33B2ABABFC700E91289 /* MyUserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED33A2ABABFC700E91289 /* MyUserDefaults.swift */; };
+		F35ED33D2ABABFE300E91289 /* Modifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED33C2ABABFE300E91289 /* Modifiers.swift */; };
+		F35ED33F2ABAC00000E91289 /* Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED33E2ABAC00000E91289 /* Functions.swift */; };
+		F35ED3412ABAC01E00E91289 /* FancyToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3402ABAC01E00E91289 /* FancyToastView.swift */; };
+		F35ED3432ABAC03D00E91289 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3422ABAC03D00E91289 /* Extensions.swift */; };
+		F35ED3452ABAC05700E91289 /* DateUtills.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3442ABAC05700E91289 /* DateUtills.swift */; };
+		F35ED3472ABAC06A00E91289 /* CustomViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3462ABAC06A00E91289 /* CustomViews.swift */; };
+		F35ED3492ABAC08100E91289 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3482ABAC08100E91289 /* Constants.swift */; };
+		F35ED34B2ABAC09700E91289 /* ApiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED34A2ABAC09700E91289 /* ApiClient.swift */; };
+		F35ED34D2ABAC0D300E91289 /* SendOtpVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED34C2ABAC0D300E91289 /* SendOtpVM.swift */; };
+		F35ED34F2ABAC1B300E91289 /* LoginVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED34E2ABAC1B300E91289 /* LoginVM.swift */; };
+		F35ED3512ABAC1C600E91289 /* DashboardVM1.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3502ABAC1C600E91289 /* DashboardVM1.swift */; };
+		F35ED3532ABAC20100E91289 /* DashboardVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3522ABAC20100E91289 /* DashboardVM.swift */; };
+		F35ED3552ABAC21400E91289 /* BecomeVolunteerVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3542ABAC21400E91289 /* BecomeVolunteerVM.swift */; };
+		F35ED3572ABAC22B00E91289 /* BaselineVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3562ABAC22B00E91289 /* BaselineVM.swift */; };
+		F35ED35B2ABAC29C00E91289 /* VolunteerParticipationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED35A2ABAC29C00E91289 /* VolunteerParticipationView.swift */; };
+		F35ED35D2ABAC2C200E91289 /* UserReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED35C2ABAC2C200E91289 /* UserReportView.swift */; };
+		F35ED35F2ABAC2D800E91289 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED35E2ABAC2D800E91289 /* SplashView.swift */; };
+		F35ED3612ABAC2FC00E91289 /* SendOtpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3602ABAC2FC00E91289 /* SendOtpView.swift */; };
+		F35ED3632ABAC31600E91289 /* ProfileSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3622ABAC31600E91289 /* ProfileSettingsView.swift */; };
+		F35ED3652ABAC32B00E91289 /* NotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3642ABAC32B00E91289 /* NotesView.swift */; };
+		F35ED3672ABAC34700E91289 /* MyProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3662ABAC34700E91289 /* MyProfileView.swift */; };
+		F35ED3692ABAC36600E91289 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3682ABAC36600E91289 /* LoginView.swift */; };
+		F35ED36B2ABAC37A00E91289 /* GetStartedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED36A2ABAC37A00E91289 /* GetStartedView.swift */; };
+		F35ED36F2ABAC3B300E91289 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED36E2ABAC3B300E91289 /* DashboardView.swift */; };
+		F35ED3712ABAC3CA00E91289 /* ClearHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3702ABAC3CA00E91289 /* ClearHistoryView.swift */; };
+		F35ED3732ABAC3EB00E91289 /* ChangePasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3722ABAC3EB00E91289 /* ChangePasswordView.swift */; };
+		F35ED3752ABAC40100E91289 /* BecomeVolunteerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3742ABAC40100E91289 /* BecomeVolunteerView.swift */; };
+		F35ED3772ABAC41700E91289 /* BaselineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3762ABAC41700E91289 /* BaselineView.swift */; };
+		F35ED3792ABAC44000E91289 /* WeeklyCoughsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3782ABAC44000E91289 /* WeeklyCoughsView.swift */; };
+		F35ED37B2ABAC45400E91289 /* HourlyCoughsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED37A2ABAC45400E91289 /* HourlyCoughsView.swift */; };
+		F35ED37D2ABAC46C00E91289 /* DailyCoughsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED37C2ABAC46C00E91289 /* DailyCoughsView.swift */; };
+		F35ED37F2ABAC4AF00E91289 /* SendOtpResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED37E2ABAC4AE00E91289 /* SendOtpResult.swift */; };
+		F35ED3812ABAC4CD00E91289 /* LoginResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3802ABAC4CD00E91289 /* LoginResult.swift */; };
+		F35ED3832ABAC4F700E91289 /* ErrorResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3822ABAC4F700E91289 /* ErrorResult.swift */; };
+		F35ED3852ABAC50B00E91289 /* ApiError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3842ABAC50B00E91289 /* ApiError.swift */; };
+		F35ED38A2ABAC62500E91289 /* AAInfographics in Frameworks */ = {isa = PBXBuildFile; productRef = F35ED3892ABAC62500E91289 /* AAInfographics */; };
+		F35ED38D2ABAC66B00E91289 /* PythonKit in Frameworks */ = {isa = PBXBuildFile; productRef = F35ED38C2ABAC66B00E91289 /* PythonKit */; };
+		F35ED3902ABAC68300E91289 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = F35ED38F2ABAC68300E91289 /* Alamofire */; };
+		F35ED3B02ABAC92C00E91289 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = F35ED3AF2ABAC92C00E91289 /* FirebaseCrashlytics */; };
+		F35ED3B22ABAC92C00E91289 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = F35ED3B12ABAC92C00E91289 /* FirebaseMessaging */; };
+		F35ED3B52ABAC98E00E91289 /* OTPView in Frameworks */ = {isa = PBXBuildFile; productRef = F35ED3B42ABAC98E00E91289 /* OTPView */; };
+		F35ED3B72ABACA4F00E91289 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F35ED3B62ABACA4F00E91289 /* GoogleService-Info.plist */; };
+		F35ED3BB2ABACADA00E91289 /* CoughMoniterCoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3B92ABACADA00E91289 /* CoughMoniterCoreModel.xcdatamodeld */; };
+		F35ED3C42ABAD96D00E91289 /* final_model_weights_no_optimization_v3.tflite in Resources */ = {isa = PBXBuildFile; fileRef = F35ED3C32ABAD96D00E91289 /* final_model_weights_no_optimization_v3.tflite */; };
+		F35ED3C62ABAD98700E91289 /* segmented_final_model_weights_no_optimization.tflite in Resources */ = {isa = PBXBuildFile; fileRef = F35ED3C52ABAD98700E91289 /* segmented_final_model_weights_no_optimization.tflite */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		5D19EEABF8D1AA348843A098 /* Pods_CoughTracking_IOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CoughTracking_IOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9AA51B4555C52FBD690B3A13 /* Pods-CoughTracking-IOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CoughTracking-IOS.debug.xcconfig"; path = "Target Support Files/Pods-CoughTracking-IOS/Pods-CoughTracking-IOS.debug.xcconfig"; sourceTree = "<group>"; };
+		B852408408A03C921EA50DBD /* Pods-CoughTracking-IOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CoughTracking-IOS.release.xcconfig"; path = "Target Support Files/Pods-CoughTracking-IOS/Pods-CoughTracking-IOS.release.xcconfig"; sourceTree = "<group>"; };
+		F35ED31A2ABABCF200E91289 /* CoughTracking-IOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CoughTracking-IOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F35ED31D2ABABCF200E91289 /* CoughTracking_IOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoughTracking_IOSApp.swift; sourceTree = "<group>"; };
+		F35ED3212ABABCF400E91289 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F35ED3242ABABCF400E91289 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		F35ED3322ABABF3600E91289 /* Shapes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shapes.swift; sourceTree = "<group>"; };
+		F35ED3342ABABF6800E91289 /* PythonFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PythonFunctions.swift; sourceTree = "<group>"; };
+		F35ED3362ABABF9300E91289 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
+		F35ED3382ABABFAE00E91289 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		F35ED33A2ABABFC700E91289 /* MyUserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyUserDefaults.swift; sourceTree = "<group>"; };
+		F35ED33C2ABABFE300E91289 /* Modifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modifiers.swift; sourceTree = "<group>"; };
+		F35ED33E2ABAC00000E91289 /* Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Functions.swift; sourceTree = "<group>"; };
+		F35ED3402ABAC01E00E91289 /* FancyToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FancyToastView.swift; sourceTree = "<group>"; };
+		F35ED3422ABAC03D00E91289 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		F35ED3442ABAC05700E91289 /* DateUtills.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateUtills.swift; sourceTree = "<group>"; };
+		F35ED3462ABAC06A00E91289 /* CustomViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomViews.swift; sourceTree = "<group>"; };
+		F35ED3482ABAC08100E91289 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		F35ED34A2ABAC09700E91289 /* ApiClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiClient.swift; sourceTree = "<group>"; };
+		F35ED34C2ABAC0D300E91289 /* SendOtpVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendOtpVM.swift; sourceTree = "<group>"; };
+		F35ED34E2ABAC1B300E91289 /* LoginVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVM.swift; sourceTree = "<group>"; };
+		F35ED3502ABAC1C600E91289 /* DashboardVM1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardVM1.swift; sourceTree = "<group>"; };
+		F35ED3522ABAC20100E91289 /* DashboardVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardVM.swift; sourceTree = "<group>"; };
+		F35ED3542ABAC21400E91289 /* BecomeVolunteerVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BecomeVolunteerVM.swift; sourceTree = "<group>"; };
+		F35ED3562ABAC22B00E91289 /* BaselineVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaselineVM.swift; sourceTree = "<group>"; };
+		F35ED35A2ABAC29C00E91289 /* VolunteerParticipationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolunteerParticipationView.swift; sourceTree = "<group>"; };
+		F35ED35C2ABAC2C200E91289 /* UserReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserReportView.swift; sourceTree = "<group>"; };
+		F35ED35E2ABAC2D800E91289 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
+		F35ED3602ABAC2FC00E91289 /* SendOtpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendOtpView.swift; sourceTree = "<group>"; };
+		F35ED3622ABAC31600E91289 /* ProfileSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsView.swift; sourceTree = "<group>"; };
+		F35ED3642ABAC32B00E91289 /* NotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesView.swift; sourceTree = "<group>"; };
+		F35ED3662ABAC34700E91289 /* MyProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyProfileView.swift; sourceTree = "<group>"; };
+		F35ED3682ABAC36600E91289 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		F35ED36A2ABAC37A00E91289 /* GetStartedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetStartedView.swift; sourceTree = "<group>"; };
+		F35ED36E2ABAC3B300E91289 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		F35ED3702ABAC3CA00E91289 /* ClearHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClearHistoryView.swift; sourceTree = "<group>"; };
+		F35ED3722ABAC3EB00E91289 /* ChangePasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePasswordView.swift; sourceTree = "<group>"; };
+		F35ED3742ABAC40100E91289 /* BecomeVolunteerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BecomeVolunteerView.swift; sourceTree = "<group>"; };
+		F35ED3762ABAC41700E91289 /* BaselineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaselineView.swift; sourceTree = "<group>"; };
+		F35ED3782ABAC44000E91289 /* WeeklyCoughsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyCoughsView.swift; sourceTree = "<group>"; };
+		F35ED37A2ABAC45400E91289 /* HourlyCoughsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyCoughsView.swift; sourceTree = "<group>"; };
+		F35ED37C2ABAC46C00E91289 /* DailyCoughsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyCoughsView.swift; sourceTree = "<group>"; };
+		F35ED37E2ABAC4AE00E91289 /* SendOtpResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendOtpResult.swift; sourceTree = "<group>"; };
+		F35ED3802ABAC4CD00E91289 /* LoginResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginResult.swift; sourceTree = "<group>"; };
+		F35ED3822ABAC4F700E91289 /* ErrorResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorResult.swift; sourceTree = "<group>"; };
+		F35ED3842ABAC50B00E91289 /* ApiError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiError.swift; sourceTree = "<group>"; };
+		F35ED3862ABAC58F00E91289 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F35ED3B62ABACA4F00E91289 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		F35ED3BA2ABACADA00E91289 /* CoughMoniterCoreModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoughMoniterCoreModel.xcdatamodel; sourceTree = "<group>"; };
+		F35ED3C32ABAD96D00E91289 /* final_model_weights_no_optimization_v3.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = final_model_weights_no_optimization_v3.tflite; sourceTree = "<group>"; };
+		F35ED3C52ABAD98700E91289 /* segmented_final_model_weights_no_optimization.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = segmented_final_model_weights_no_optimization.tflite; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F35ED3172ABABCF200E91289 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F35ED3B52ABAC98E00E91289 /* OTPView in Frameworks */,
+				F35ED3B22ABAC92C00E91289 /* FirebaseMessaging in Frameworks */,
+				C06522C317DF6DF9DC6F76D3 /* Pods_CoughTracking_IOS.framework in Frameworks */,
+				F35ED3902ABAC68300E91289 /* Alamofire in Frameworks */,
+				F35ED3B02ABAC92C00E91289 /* FirebaseCrashlytics in Frameworks */,
+				F35ED38A2ABAC62500E91289 /* AAInfographics in Frameworks */,
+				F35ED38D2ABAC66B00E91289 /* PythonKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AAFBC96411247345FC9FC7D0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5D19EEABF8D1AA348843A098 /* Pods_CoughTracking_IOS.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C6FDC5CD1B89A3AF5598E390 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				9AA51B4555C52FBD690B3A13 /* Pods-CoughTracking-IOS.debug.xcconfig */,
+				B852408408A03C921EA50DBD /* Pods-CoughTracking-IOS.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		F35ED3112ABABCF200E91289 = {
+			isa = PBXGroup;
+			children = (
+				F35ED3C52ABAD98700E91289 /* segmented_final_model_weights_no_optimization.tflite */,
+				F35ED3C32ABAD96D00E91289 /* final_model_weights_no_optimization_v3.tflite */,
+				F35ED31C2ABABCF200E91289 /* CoughTracking-IOS */,
+				F35ED31B2ABABCF200E91289 /* Products */,
+				C6FDC5CD1B89A3AF5598E390 /* Pods */,
+				AAFBC96411247345FC9FC7D0 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		F35ED31B2ABABCF200E91289 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F35ED31A2ABABCF200E91289 /* CoughTracking-IOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F35ED31C2ABABCF200E91289 /* CoughTracking-IOS */ = {
+			isa = PBXGroup;
+			children = (
+				F35ED3B82ABACAA600E91289 /* CoreData */,
+				F35ED3312ABABEE500E91289 /* ViewModels */,
+				F35ED3302ABABED400E91289 /* Models */,
+				F35ED32F2ABABEB000E91289 /* InfoPList */,
+				F35ED32E2ABABE9A00E91289 /* Fonts */,
+				F35ED32D2ABABE7F00E91289 /* ApiManagement */,
+				F35ED32C2ABABD6D00E91289 /* UIViews */,
+				F35ED32B2ABABD4900E91289 /* Utills */,
+				F35ED31D2ABABCF200E91289 /* CoughTracking_IOSApp.swift */,
+				F35ED3212ABABCF400E91289 /* Assets.xcassets */,
+				F35ED3232ABABCF400E91289 /* Preview Content */,
+			);
+			path = "CoughTracking-IOS";
+			sourceTree = "<group>";
+		};
+		F35ED3232ABABCF400E91289 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				F35ED3242ABABCF400E91289 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		F35ED32B2ABABD4900E91289 /* Utills */ = {
+			isa = PBXGroup;
+			children = (
+				F35ED3322ABABF3600E91289 /* Shapes.swift */,
+				F35ED3342ABABF6800E91289 /* PythonFunctions.swift */,
+				F35ED3362ABABF9300E91289 /* PersistenceController.swift */,
+				F35ED3382ABABFAE00E91289 /* NetworkManager.swift */,
+				F35ED33A2ABABFC700E91289 /* MyUserDefaults.swift */,
+				F35ED33C2ABABFE300E91289 /* Modifiers.swift */,
+				F35ED33E2ABAC00000E91289 /* Functions.swift */,
+				F35ED3402ABAC01E00E91289 /* FancyToastView.swift */,
+				F35ED3422ABAC03D00E91289 /* Extensions.swift */,
+				F35ED3442ABAC05700E91289 /* DateUtills.swift */,
+				F35ED3462ABAC06A00E91289 /* CustomViews.swift */,
+				F35ED3482ABAC08100E91289 /* Constants.swift */,
+			);
+			path = Utills;
+			sourceTree = "<group>";
+		};
+		F35ED32C2ABABD6D00E91289 /* UIViews */ = {
+			isa = PBXGroup;
+			children = (
+				F35ED36D2ABAC3A200E91289 /* Dashboard */,
+				F35ED3592ABAC28800E91289 /* Main */,
+				F35ED3582ABAC27D00E91289 /* StartUp */,
+			);
+			path = UIViews;
+			sourceTree = "<group>";
+		};
+		F35ED32D2ABABE7F00E91289 /* ApiManagement */ = {
+			isa = PBXGroup;
+			children = (
+				F35ED34A2ABAC09700E91289 /* ApiClient.swift */,
+			);
+			path = ApiManagement;
+			sourceTree = "<group>";
+		};
+		F35ED32E2ABABE9A00E91289 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		F35ED32F2ABABEB000E91289 /* InfoPList */ = {
+			isa = PBXGroup;
+			children = (
+				F35ED3862ABAC58F00E91289 /* Info.plist */,
+				F35ED3B62ABACA4F00E91289 /* GoogleService-Info.plist */,
+			);
+			path = InfoPList;
+			sourceTree = "<group>";
+		};
+		F35ED3302ABABED400E91289 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F35ED37E2ABAC4AE00E91289 /* SendOtpResult.swift */,
+				F35ED3802ABAC4CD00E91289 /* LoginResult.swift */,
+				F35ED3822ABAC4F700E91289 /* ErrorResult.swift */,
+				F35ED3842ABAC50B00E91289 /* ApiError.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		F35ED3312ABABEE500E91289 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				F35ED34C2ABAC0D300E91289 /* SendOtpVM.swift */,
+				F35ED34E2ABAC1B300E91289 /* LoginVM.swift */,
+				F35ED3502ABAC1C600E91289 /* DashboardVM1.swift */,
+				F35ED3522ABAC20100E91289 /* DashboardVM.swift */,
+				F35ED3542ABAC21400E91289 /* BecomeVolunteerVM.swift */,
+				F35ED3562ABAC22B00E91289 /* BaselineVM.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		F35ED3582ABAC27D00E91289 /* StartUp */ = {
+			isa = PBXGroup;
+			children = (
+				F35ED35E2ABAC2D800E91289 /* SplashView.swift */,
+				F35ED3602ABAC2FC00E91289 /* SendOtpView.swift */,
+				F35ED3682ABAC36600E91289 /* LoginView.swift */,
+				F35ED36A2ABAC37A00E91289 /* GetStartedView.swift */,
+				F35ED3762ABAC41700E91289 /* BaselineView.swift */,
+			);
+			path = StartUp;
+			sourceTree = "<group>";
+		};
+		F35ED3592ABAC28800E91289 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				F35ED35A2ABAC29C00E91289 /* VolunteerParticipationView.swift */,
+				F35ED35C2ABAC2C200E91289 /* UserReportView.swift */,
+				F35ED3622ABAC31600E91289 /* ProfileSettingsView.swift */,
+				F35ED3642ABAC32B00E91289 /* NotesView.swift */,
+				F35ED3662ABAC34700E91289 /* MyProfileView.swift */,
+				F35ED3702ABAC3CA00E91289 /* ClearHistoryView.swift */,
+				F35ED3722ABAC3EB00E91289 /* ChangePasswordView.swift */,
+				F35ED3742ABAC40100E91289 /* BecomeVolunteerView.swift */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		F35ED36D2ABAC3A200E91289 /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				F35ED36E2ABAC3B300E91289 /* DashboardView.swift */,
+				F35ED3782ABAC44000E91289 /* WeeklyCoughsView.swift */,
+				F35ED37A2ABAC45400E91289 /* HourlyCoughsView.swift */,
+				F35ED37C2ABAC46C00E91289 /* DailyCoughsView.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
+		F35ED3B82ABACAA600E91289 /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				F35ED3B92ABACADA00E91289 /* CoughMoniterCoreModel.xcdatamodeld */,
+			);
+			path = CoreData;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F35ED3192ABABCF200E91289 /* CoughTracking-IOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F35ED3282ABABCF400E91289 /* Build configuration list for PBXNativeTarget "CoughTracking-IOS" */;
+			buildPhases = (
+				A65E28FB807A63DDB21EC2DD /* [CP] Check Pods Manifest.lock */,
+				F35ED3162ABABCF200E91289 /* Sources */,
+				F35ED3172ABABCF200E91289 /* Frameworks */,
+				F35ED3182ABABCF200E91289 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "CoughTracking-IOS";
+			packageProductDependencies = (
+				F35ED3892ABAC62500E91289 /* AAInfographics */,
+				F35ED38C2ABAC66B00E91289 /* PythonKit */,
+				F35ED38F2ABAC68300E91289 /* Alamofire */,
+				F35ED3AF2ABAC92C00E91289 /* FirebaseCrashlytics */,
+				F35ED3B12ABAC92C00E91289 /* FirebaseMessaging */,
+				F35ED3B42ABAC98E00E91289 /* OTPView */,
+			);
+			productName = "CoughTracking-IOS";
+			productReference = F35ED31A2ABABCF200E91289 /* CoughTracking-IOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F35ED3122ABABCF200E91289 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1430;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					F35ED3192ABABCF200E91289 = {
+						CreatedOnToolsVersion = 14.3.1;
+					};
+				};
+			};
+			buildConfigurationList = F35ED3152ABABCF200E91289 /* Build configuration list for PBXProject "CoughTracking-IOS" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = F35ED3112ABABCF200E91289;
+			packageReferences = (
+				F35ED3882ABAC62500E91289 /* XCRemoteSwiftPackageReference "AAChartKit-Swift" */,
+				F35ED38B2ABAC66B00E91289 /* XCRemoteSwiftPackageReference "PythonKit" */,
+				F35ED38E2ABAC68300E91289 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				F35ED3AE2ABAC92C00E91289 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				F35ED3B32ABAC98E00E91289 /* XCRemoteSwiftPackageReference "otpview-swiftui" */,
+			);
+			productRefGroup = F35ED31B2ABABCF200E91289 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F35ED3192ABABCF200E91289 /* CoughTracking-IOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F35ED3182ABABCF200E91289 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F35ED3252ABABCF400E91289 /* Preview Assets.xcassets in Resources */,
+				F35ED3C42ABAD96D00E91289 /* final_model_weights_no_optimization_v3.tflite in Resources */,
+				F35ED3C62ABAD98700E91289 /* segmented_final_model_weights_no_optimization.tflite in Resources */,
+				F35ED3B72ABACA4F00E91289 /* GoogleService-Info.plist in Resources */,
+				F35ED3222ABABCF400E91289 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A65E28FB807A63DDB21EC2DD /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CoughTracking-IOS-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F35ED3162ABABCF200E91289 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F35ED33B2ABABFC700E91289 /* MyUserDefaults.swift in Sources */,
+				F35ED37D2ABAC46C00E91289 /* DailyCoughsView.swift in Sources */,
+				F35ED3732ABAC3EB00E91289 /* ChangePasswordView.swift in Sources */,
+				F35ED3692ABAC36600E91289 /* LoginView.swift in Sources */,
+				F35ED37F2ABAC4AF00E91289 /* SendOtpResult.swift in Sources */,
+				F35ED3392ABABFAE00E91289 /* NetworkManager.swift in Sources */,
+				F35ED33F2ABAC00000E91289 /* Functions.swift in Sources */,
+				F35ED3772ABAC41700E91289 /* BaselineView.swift in Sources */,
+				F35ED3712ABAC3CA00E91289 /* ClearHistoryView.swift in Sources */,
+				F35ED3672ABAC34700E91289 /* MyProfileView.swift in Sources */,
+				F35ED31E2ABABCF200E91289 /* CoughTracking_IOSApp.swift in Sources */,
+				F35ED3812ABAC4CD00E91289 /* LoginResult.swift in Sources */,
+				F35ED3BB2ABACADA00E91289 /* CoughMoniterCoreModel.xcdatamodeld in Sources */,
+				F35ED37B2ABAC45400E91289 /* HourlyCoughsView.swift in Sources */,
+				F35ED33D2ABABFE300E91289 /* Modifiers.swift in Sources */,
+				F35ED3452ABAC05700E91289 /* DateUtills.swift in Sources */,
+				F35ED3412ABAC01E00E91289 /* FancyToastView.swift in Sources */,
+				F35ED3332ABABF3600E91289 /* Shapes.swift in Sources */,
+				F35ED3632ABAC31600E91289 /* ProfileSettingsView.swift in Sources */,
+				F35ED3352ABABF6800E91289 /* PythonFunctions.swift in Sources */,
+				F35ED35B2ABAC29C00E91289 /* VolunteerParticipationView.swift in Sources */,
+				F35ED3752ABAC40100E91289 /* BecomeVolunteerView.swift in Sources */,
+				F35ED34D2ABAC0D300E91289 /* SendOtpVM.swift in Sources */,
+				F35ED3572ABAC22B00E91289 /* BaselineVM.swift in Sources */,
+				F35ED3532ABAC20100E91289 /* DashboardVM.swift in Sources */,
+				F35ED3832ABAC4F700E91289 /* ErrorResult.swift in Sources */,
+				F35ED3612ABAC2FC00E91289 /* SendOtpView.swift in Sources */,
+				F35ED3792ABAC44000E91289 /* WeeklyCoughsView.swift in Sources */,
+				F35ED3552ABAC21400E91289 /* BecomeVolunteerVM.swift in Sources */,
+				F35ED36B2ABAC37A00E91289 /* GetStartedView.swift in Sources */,
+				F35ED3652ABAC32B00E91289 /* NotesView.swift in Sources */,
+				F35ED35D2ABAC2C200E91289 /* UserReportView.swift in Sources */,
+				F35ED3432ABAC03D00E91289 /* Extensions.swift in Sources */,
+				F35ED35F2ABAC2D800E91289 /* SplashView.swift in Sources */,
+				F35ED3492ABAC08100E91289 /* Constants.swift in Sources */,
+				F35ED3852ABAC50B00E91289 /* ApiError.swift in Sources */,
+				F35ED36F2ABAC3B300E91289 /* DashboardView.swift in Sources */,
+				F35ED3372ABABF9300E91289 /* PersistenceController.swift in Sources */,
+				F35ED3472ABAC06A00E91289 /* CustomViews.swift in Sources */,
+				F35ED3512ABAC1C600E91289 /* DashboardVM1.swift in Sources */,
+				F35ED34B2ABAC09700E91289 /* ApiClient.swift in Sources */,
+				F35ED34F2ABAC1B300E91289 /* LoginVM.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F35ED3262ABABCF400E91289 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		F35ED3272ABABCF400E91289 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F35ED3292ABABCF400E91289 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9AA51B4555C52FBD690B3A13 /* Pods-CoughTracking-IOS.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"CoughTracking-IOS/Preview Content\"";
+				DEVELOPMENT_TEAM = NKN9CVD55L;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "/Users/alirizwan/Desktop/iOSProjects/CoughTracking-IOS/CoughTracking-IOS/InfoPList/Info.plist";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ai4lyf.CoughTracking.IOS;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F35ED32A2ABABCF400E91289 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B852408408A03C921EA50DBD /* Pods-CoughTracking-IOS.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"CoughTracking-IOS/Preview Content\"";
+				DEVELOPMENT_TEAM = NKN9CVD55L;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "/Users/alirizwan/Desktop/iOSProjects/CoughTracking-IOS/CoughTracking-IOS/InfoPList/Info.plist";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ai4lyf.CoughTracking.IOS;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F35ED3152ABABCF200E91289 /* Build configuration list for PBXProject "CoughTracking-IOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F35ED3262ABABCF400E91289 /* Debug */,
+				F35ED3272ABABCF400E91289 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F35ED3282ABABCF400E91289 /* Build configuration list for PBXNativeTarget "CoughTracking-IOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F35ED3292ABABCF400E91289 /* Debug */,
+				F35ED32A2ABABCF400E91289 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F35ED3882ABAC62500E91289 /* XCRemoteSwiftPackageReference "AAChartKit-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AAChartModel/AAChartKit-Swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
+		F35ED38B2ABAC66B00E91289 /* XCRemoteSwiftPackageReference "PythonKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pvieito/PythonKit.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		F35ED38E2ABAC68300E91289 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+		F35ED3AE2ABAC92C00E91289 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.0.0;
+			};
+		};
+		F35ED3B32ABAC98E00E91289 /* XCRemoteSwiftPackageReference "otpview-swiftui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mukeshsolanki/otpview-swiftui.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F35ED3892ABAC62500E91289 /* AAInfographics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F35ED3882ABAC62500E91289 /* XCRemoteSwiftPackageReference "AAChartKit-Swift" */;
+			productName = AAInfographics;
+		};
+		F35ED38C2ABAC66B00E91289 /* PythonKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F35ED38B2ABAC66B00E91289 /* XCRemoteSwiftPackageReference "PythonKit" */;
+			productName = PythonKit;
+		};
+		F35ED38F2ABAC68300E91289 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F35ED38E2ABAC68300E91289 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		F35ED3AF2ABAC92C00E91289 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F35ED3AE2ABAC92C00E91289 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		F35ED3B12ABAC92C00E91289 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F35ED3AE2ABAC92C00E91289 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+		F35ED3B42ABAC98E00E91289 /* OTPView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F35ED3B32ABAC98E00E91289 /* XCRemoteSwiftPackageReference "otpview-swiftui" */;
+			productName = OTPView;
+		};
+/* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		F35ED3B92ABACADA00E91289 /* CoughMoniterCoreModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				F35ED3BA2ABACADA00E91289 /* CoughMoniterCoreModel.xcdatamodel */,
+			);
+			currentVersion = F35ED3BA2ABACADA00E91289 /* CoughMoniterCoreModel.xcdatamodel */;
+			path = CoughMoniterCoreModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = F35ED3122ABABCF200E91289 /* Project object */;
+}

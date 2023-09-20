@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21754" systemVersion="22G91" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Cough" representedClassName="Cough" syncable="YES" codeGenerationType="class">
+        <attribute name="coughPower" optional="YES" attributeType="String"/>
+        <attribute name="coughSegments" optional="YES" attributeType="Transformable" customClassName="[[Float]]"/>
+        <attribute name="date" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="time" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="CoughBaseline" representedClassName="CoughBaseline" syncable="YES" codeGenerationType="class">
+        <attribute name="createdOn" optional="YES" attributeType="String"/>
+        <attribute name="uid" optional="YES" attributeType="String"/>
+        <relationship name="coughSegments" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CoughEntity"/>
+    </entity>
+    <entity name="CoughEntity" representedClassName="CoughEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="value" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="CoughTrackingHours" representedClassName="CoughTrackingHours" syncable="YES" codeGenerationType="class">
+        <attribute name="date" optional="YES" attributeType="String"/>
+        <attribute name="hoursTrack" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="Notes" representedClassName="Notes" syncable="YES" codeGenerationType="class">
+        <attribute name="date" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="note" optional="YES" attributeType="String"/>
+        <attribute name="time" optional="YES" attributeType="String"/>
+    </entity>
+</model>

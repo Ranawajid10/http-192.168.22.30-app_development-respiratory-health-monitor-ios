@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:CoughTracking-IOS/CoreData/CoughEntity+CoreDataClass.swift">
+   </FileRef>
+   <FileRef
+      location = "group:CoughTracking-IOS/CoreData/CoughEntity+CoreDataProperties.swift">
+   </FileRef>
+   <FileRef
+      location = "group:CoughTracking-IOS/CoreData/CoughTrackingHours+CoreDataClass.swift">
+   </FileRef>
+   <FileRef
+      location = "group:CoughTracking-IOS/CoreData/CoughTrackingHours+CoreDataProperties.swift">
+   </FileRef>
+   <FileRef
+      location = "group:CoughTracking-IOS/CoreData/CoughBaseline+CoreDataClass.swift">
+   </FileRef>
+   <FileRef
+      location = "group:CoughTracking-IOS/CoreData/CoughBaseline+CoreDataProperties.swift">
+   </FileRef>
+   <FileRef
+      location = "group:CoughTracking-IOS/CoreData/Cough+CoreDataClass.swift">
+   </FileRef>
+   <FileRef
+      location = "group:CoughTracking-IOS/CoreData/Cough+CoreDataProperties.swift">
+   </FileRef>
+   <FileRef
+      location = "group:CoughTracking-IOS/CoreData/Notes+CoreDataClass.swift">
+   </FileRef>
+   <FileRef
+      location = "group:CoughTracking-IOS/CoreData/Notes+CoreDataProperties.swift">
+   </FileRef>
+   <FileRef
+      location = "group:CoughTracking-IOS.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Pods/Pods.xcodeproj">
+   </FileRef>
+</Workspace>
