@@ -61,6 +61,7 @@
 		F35ED3BB2ABACADA00E91289 /* CoughMoniterCoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F35ED3B92ABACADA00E91289 /* CoughMoniterCoreModel.xcdatamodeld */; };
 		F35ED3C42ABAD96D00E91289 /* final_model_weights_no_optimization_v3.tflite in Resources */ = {isa = PBXBuildFile; fileRef = F35ED3C32ABAD96D00E91289 /* final_model_weights_no_optimization_v3.tflite */; };
 		F35ED3C62ABAD98700E91289 /* segmented_final_model_weights_no_optimization.tflite in Resources */ = {isa = PBXBuildFile; fileRef = F35ED3C52ABAD98700E91289 /* segmented_final_model_weights_no_optimization.tflite */; };
+		F35ED3CD2ABAEFF500E91289 /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F35ED3CC2ABAEFF500E91289 /* Lato-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -134,6 +135,7 @@
 		F35ED3BA2ABACADA00E91289 /* CoughMoniterCoreModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoughMoniterCoreModel.xcdatamodel; sourceTree = "<group>"; };
 		F35ED3C32ABAD96D00E91289 /* final_model_weights_no_optimization_v3.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = final_model_weights_no_optimization_v3.tflite; sourceTree = "<group>"; };
 		F35ED3C52ABAD98700E91289 /* segmented_final_model_weights_no_optimization.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = segmented_final_model_weights_no_optimization.tflite; sourceTree = "<group>"; };
+		F35ED3CC2ABAEFF500E91289 /* Lato-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Regular.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -267,6 +269,7 @@
 		F35ED32E2ABABE9A00E91289 /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
+				F35ED3CC2ABAEFF500E91289 /* Lato-Regular.ttf */,
 			);
 			path = Fonts;
 			sourceTree = "<group>";
@@ -450,6 +453,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F35ED3252ABABCF400E91289 /* Preview Assets.xcassets in Resources */,
+				F35ED3CD2ABAEFF500E91289 /* Lato-Regular.ttf in Resources */,
 				F35ED3C42ABAD96D00E91289 /* final_model_weights_no_optimization_v3.tflite in Resources */,
 				F35ED3C62ABAD98700E91289 /* segmented_final_model_weights_no_optimization.tflite in Resources */,
 				F35ED3B72ABACA4F00E91289 /* GoogleService-Info.plist in Resources */,
