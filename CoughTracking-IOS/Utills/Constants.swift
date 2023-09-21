@@ -26,6 +26,10 @@ class Constants{
     static let baseLineLoudness : String =  "baseLineLoudness"
     static let userData : String =  "userData"
     static let image : String =  "image"
+    static let isMicStopbyUser : String =  "isMicStopbyUser"
+    static let isStatisticsOn : String =  "isStatisticsOn"
+    static let isCoughStatOn : String =  "isCoughStatOn"
+    static let isFirstSync : String =  "isFirstSync"
     
     
     

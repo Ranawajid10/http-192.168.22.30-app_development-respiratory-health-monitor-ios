@@ -68,6 +68,7 @@ class BaselineVM:ObservableObject{
                     MyUserDefaults.saveUserData(value: success)
                     MyUserDefaults.saveFloat(forKey: Constants.baseLineLoudness, value: maxLoudness)
                     MyUserDefaults.saveBool(forKey:Constants.isBaseLineSet, value: true)
+                    MyUserDefaults.saveBool(forKey: Constants.isFirstSync, value: true)
                     isError = false
                     goNext = true
                     

@@ -100,7 +100,9 @@ struct WeeklyCoughsView: View {
                                     
                                 }.onDisappear{
                                     
-                                    dashboardVM.startRecording()
+                                    if(!MyUserDefaults.getBool(forKey: Constants.isMicStopbyUser)){
+                                        dashboardVM.startRecording()
+                                    }
                                     
                                 }
                             

@@ -11,6 +11,7 @@ import CoreData
 
 struct DashboardView: View {
     
+    @FetchRequest(entity: VolunteerCough.entity(), sortDescriptors: []) var allValunteerCoughFetchResult: FetchedResults<VolunteerCough>
     @FetchRequest(entity: CoughTrackingHours.entity(), sortDescriptors: []) var coughTrackingHoursFetchResult: FetchedResults<CoughTrackingHours>
     @FetchRequest(entity: Cough.entity(), sortDescriptors: []) var coughFetchResult: FetchedResults<Cough>
     
@@ -34,6 +35,7 @@ struct DashboardView: View {
     @State var totalTrackedHours:Double = 0.0
     @State var coughsPerHour:Int = 0
     
+    @State private var toast: FancyToast? = nil
     
     var body: some View {
         
@@ -42,7 +44,7 @@ struct DashboardView: View {
             
             VStack{
                 
-                HomeTopBar(dashboardVM: dashboardVM, showScheduleSheet:$showScheduleSheet)
+                HomeTopBar(dashboardVM: dashboardVM, showScheduleSheet:$showScheduleSheet,showSyncDataSheet:$showSyncDataSheet)
                 
                 
                 
@@ -117,7 +119,8 @@ struct DashboardView: View {
             
             
             
-        }.environment(\.managedObjectContext,viewContext)
+        }.toastView(toast: $toast)
+            .environment(\.managedObjectContext,viewContext)
             .navigationBarBackButtonHidden()
             .sheet(isPresented: $showScheduleSheet) {
                 
@@ -127,20 +130,24 @@ struct DashboardView: View {
                 
             }.sheet(isPresented: $showMicStopSheet) {
                 
-                MicStopBottomSheet()
+                MicStopBottomSheet(dashboardVM: dashboardVM, showStopMicSheet: $showMicStopSheet)
                     .presentationDetents([.height(100)])
                     .presentationCornerRadius(35)
                 
             }.sheet(isPresented: $showSyncDataSheet) {
                 
-                SyncDataBottomSheet()
+                SyncDataBottomSheet(dashboardVM: dashboardVM, showSyncDataSheet: $showSyncDataSheet)
                     .presentationDetents([.height(170)])
                     .presentationCornerRadius(35)
                 
             }.onAppear{
                 
+                dashboardVM.allCoughList = Array(allValunteerCoughFetchResult)
+                
                 calculateTotalCoughHours()
-//                dashboardVM.startRecording()
+                                if(!MyUserDefaults.getBool(forKey: Constants.isMicStopbyUser)){
+                                    dashboardVM.startRecording()
+                                }
                 
                 
                 
@@ -165,11 +172,47 @@ struct DashboardView: View {
             })
             .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextObjectsDidChange)) { _ in
                 
+                
+                dashboardVM.allCoughList.removeAll()
+                
+                dashboardVM.allCoughList =  Array(allValunteerCoughFetchResult)
+                
                 allCoughList =  Array(coughFetchResult)
                 totalCoughCount = allCoughList.count
                 calculateTotalCoughHours()
                 
-            }
+                if(MyUserDefaults.getBool(forKey:Constants.isCoughStatOn)){
+                    
+                    if(allValunteerCoughFetchResult.count==5){
+                        
+                        dashboardVM.decideCoughUpload()
+                        
+                    }
+                    
+                }
+                
+                
+                
+            }.onReceive(dashboardVM.$isError, perform:  { i in
+                
+                if(i){
+                    
+                    toast = FancyToast(type: .error, title: "Error occurred!", message: dashboardVM.errorMessage)
+                    dashboardVM.isError = false
+                    
+                }
+                
+                
+            }).onReceive(dashboardVM.$isDeleteAllCough, perform:  { i in
+                
+                if(i){
+                    
+                    deleteAllCoughs()
+                    
+                }
+                
+                
+            })
     }
     
     func calculateTotalCoughHours(){
@@ -306,6 +349,19 @@ struct DashboardView: View {
     }
     
     
+    func deleteAllCoughs(){
+        
+        for cough in allValunteerCoughFetchResult {
+            
+            viewContext.delete(cough)
+            print("delete cough")
+            
+        }
+        
+        
+    }
+    
+    
     
 }
 
@@ -414,6 +470,7 @@ struct HomeTopBar: View {
     @ObservedObject  var dashboardVM:DashboardVM
     
     @Binding var showScheduleSheet:Bool
+    @Binding var showSyncDataSheet:Bool
     @Environment(\.managedObjectContext) private var viewContext
     
     var body: some View {
@@ -432,6 +489,7 @@ struct HomeTopBar: View {
             
             Button {
                 
+                showSyncDataSheet.toggle()
                 
             } label: {
                 
@@ -743,6 +801,8 @@ struct ScheduleMonitoringBottomSheet:View{
 
 struct MicStopBottomSheet:View{
     
+    @StateObject var dashboardVM : DashboardVM
+    @Binding var showStopMicSheet:Bool
     
     var body: some View{
         
@@ -755,6 +815,9 @@ struct MicStopBottomSheet:View{
             
             Button {
                 
+                dashboardVM.stopRecording()
+                MyUserDefaults.saveBool(forKey: Constants.isMicStopbyUser, value: true)
+                showStopMicSheet.toggle()
                 
             } label: {
                 
@@ -762,13 +825,14 @@ struct MicStopBottomSheet:View{
                 Text("Stop")
                     .foregroundColor(Color.red)
                     .modifier(LatoFontModifier(fontWeight: .bold, fontSize: 16))
+                    .frame(width: UIScreen.main.bounds.width-60,height: 42)
+                    .background(Color.lightBlue)
+                    .cornerRadius(40)
                 
                 
-            }.frame(width: UIScreen.main.bounds.width-60,height: 42)
-                .background(Color.lightBlue)
-                .cornerRadius(40)
-                .padding(.horizontal)
-                .padding(.top,20)
+            }
+            .padding(.horizontal)
+            .padding(.top,20)
             
             
             Spacer()
@@ -787,9 +851,16 @@ struct MicStopBottomSheet:View{
 
 struct SyncDataBottomSheet:View{
     
+    @StateObject var dashboardVM : DashboardVM
+    @Binding var showSyncDataSheet:Bool
     
     @State var isCoughOn = false
     @State var isStatisticsOn = false
+    
+    @State var isError = false
+    @State var errorMessage:String = ""
+    
+    @State private var toast: FancyToast? = nil
     
     var body: some View{
         
@@ -820,9 +891,22 @@ struct SyncDataBottomSheet:View{
             }.padding(.horizontal)
             
             
-            NavigationLink {
+            Button {
                 
-               
+                if(isCoughOn || isStatisticsOn){
+                    
+                    MyUserDefaults.saveBool(forKey: Constants.isCoughStatOn, value: isCoughOn)
+                    MyUserDefaults.saveBool(forKey: Constants.isStatisticsOn, value: isStatisticsOn)
+                    
+                    dashboardVM.decideCoughUpload()
+                    
+                    
+                }else{
+                    
+                    isError = true
+                    errorMessage = "Please enable cough or stats to continue"
+                    
+                }
                 
             } label: {
                 
@@ -830,16 +914,27 @@ struct SyncDataBottomSheet:View{
                 Text("Start")
                     .font(.system(size: 16))
                     .foregroundColor(Color.white)
+                    .frame(width: UIScreen.main.bounds.width-60,height: 42)
+                    .background(Color.appColorBlue)
+                    .cornerRadius(40)
                 
                 
-            }.frame(width: UIScreen.main.bounds.width-60,height: 42)
-                .background(Color.appColorBlue)
-                .cornerRadius(40)
-                .padding(.vertical)
+            }.padding(.vertical)
             
-        }.padding(.top)
+        }.toastView(toast: $toast)
+            .padding(.top)
             .padding(.horizontal)
             .background(Color.screenBG)
+            .onChange(of: isError){ newValue in
+                
+                if(newValue){
+                    
+                    toast = FancyToast(type: .error, title: "Error occurred!", message: errorMessage)
+                    isError = false
+                    
+                }
+                
+            }
         
         
     }

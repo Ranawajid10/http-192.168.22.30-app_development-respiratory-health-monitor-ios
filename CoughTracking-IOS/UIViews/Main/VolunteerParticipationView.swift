@@ -14,17 +14,19 @@ struct VolunteerParticipationView: View {
     @FetchRequest(entity: VolunteerCough.entity(), sortDescriptors: []) var allCoughFetchResult: FetchedResults<VolunteerCough>
     
    
+    @State private var toast: FancyToast? = nil
     
     @ObservedObject var audioPlayerManager = AudioPlayerManager()
-    @ObservedObject var vpVM = VolunteerParticipationVM()
+    @StateObject var vpVM = VolunteerParticipationVM()
     
     @State var isPlaying = false
     @State var playingPosition = 0
+    @State var allCoughCount = 0
     
     var body: some View {
         ZStack {
             
-            if(vpVM.allCoughList.count>0){
+            if(allCoughCount>0){
                 
                 VStack {
                     Text("To ensure the privacy of out users, we are displaying all the coughs till now so that our users can hear them before uploading them to the cloud.")
@@ -242,7 +244,18 @@ struct VolunteerParticipationView: View {
                     Button {
                         
                         if(vpVM.selectedCoughsList.count==0){
-                            //Donate
+                           
+                            if(vpVM.allCoughList.count==0){
+                                
+                                vpVM.isError = true
+                                vpVM.errorMessage = "No Samples found"
+                                
+                            }else{
+                                
+                                vpVM.donateSamples()
+                                
+                            }
+                        
                             
                         }else{
                         
@@ -287,12 +300,23 @@ struct VolunteerParticipationView: View {
             }
         }
         .onAppear{
-            
+           
             vpVM.allCoughList = Array(allCoughFetchResult)
             
-        }
+            allCoughCount = vpVM.allCoughList.count
+            
+        }.toastView(toast: $toast)
         .background(Color.screenBG)
         .navigationTitle("Volunteer Participation")
+        .onChange(of: vpVM.isError){ newValue in
+            
+            if(newValue){
+                
+                toast = FancyToast(type: .error, title: "Error occurred!", message: vpVM.errorMessage)
+                vpVM.isError = false
+            }
+            
+        }
     }
     
     func deleteSelectedCoughs(){

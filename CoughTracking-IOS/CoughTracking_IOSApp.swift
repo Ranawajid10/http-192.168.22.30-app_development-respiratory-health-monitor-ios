@@ -55,8 +55,9 @@ struct CoughTracking_IOSApp: App {
                 }
             }.onAppear{
                 
+                MyUserDefaults.saveBool(forKey: Constants.isMicStopbyUser, value: false)
                 var ur = MyUserDefaults.getUserData() ?? LoginResult()
-                print("barear",ur.token)
+                print("barear",ur.token ?? "")
                 
             }
         }

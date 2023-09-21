@@ -12,6 +12,13 @@ import TensorFlowLite
 
 class DashboardVM:ObservableObject{
     
+    @Published var isError = false
+    @Published var errorMessage:String = ""
+    
+    
+    @Published var isSyncing = false
+    @Published var isDeleteAllCough = false
+    
     @Published var saveCough = false
     @Published  var isRecording = false
     @Published private var isPlaying = false
@@ -31,6 +38,7 @@ class DashboardVM:ObservableObject{
     
     @Published var totalSecondsRecordedToday: Double = 0.0
     
+    @Published var allCoughList:[VolunteerCough] = []
     
     func startRecording(){
         
@@ -55,6 +63,17 @@ class DashboardVM:ObservableObject{
             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
         ]
         
+        
+        let audioEngine = AVAudioEngine()
+         let audioInputNode = audioEngine.inputNode
+
+         // Add an equalization filter to reduce background noise
+         let eqFilter = AVAudioUnitEQ(numberOfBands: 1)
+         eqFilter.globalGain = -20 // Adjust this value to reduce noise
+
+         audioEngine.attach(eqFilter)
+         audioEngine.connect(audioInputNode, to: eqFilter, format: audioInputNode.outputFormat(forBus: 0))
+         audioEngine.connect(eqFilter, to: audioEngine.mainMixerNode, format: audioInputNode.outputFormat(forBus: 0))
         
         do {
             
@@ -155,9 +174,8 @@ class DashboardVM:ObservableObject{
                 
                 let rsp = MyUserDefaults.getFloat(forKey: Constants.baseLineLoudness)
                 
-                let cc =  instance(array: x, fs: fs, rsp: rsp,buffer: buffer!)
+                let cc =  PythonFunctions.instance(array: x, fs: fs, rsp: rsp,buffer: buffer!)
                 
-                print("Da",cc.2?.count ?? 0,"\n\n\n\n\n")
                 
                 if(cc.2?.count ?? 0>0){
                     
@@ -182,143 +200,76 @@ class DashboardVM:ObservableObject{
     }
     
     
-    func saveWAVFileToDocumentsDirectory(floatArray: [Float], sampleRate: Double, fileName: String) throws -> URL {
-        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let filePath = documentsDirectory.appendingPathComponent(fileName)
+    func decideCoughUpload(){
         
-        do {
-            try convertFloatAudioToWAV(floatArray: floatArray, sampleRate: sampleRate, filePath: filePath)
-            return filePath
-        } catch {
-            throw error
-        }
-    }
-    
-    
-    func convertFloatAudioToWAV(floatArray: [Float], sampleRate: Double, filePath: URL) throws {
-        
-        let audioFormat = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sampleRate, channels: 1, interleaved: false)
-        
-        let audioFile = try AVAudioFile(forWriting: filePath, settings: audioFormat!.settings)
-        
-        let buffer = AVAudioPCMBuffer(pcmFormat: audioFormat!, frameCapacity: AVAudioFrameCount(floatArray.count))
-        buffer!.frameLength = AVAudioFrameCount(floatArray.count)
-        
-        for i in 0..<Int(buffer!.frameLength) {
-            buffer!.floatChannelData![0][i] = floatArray[i]
-        }
-        
-        try audioFile.write(from: buffer!)
-    }
-    
-    func instance(array: [Float], fs: Float, rsp: Float,buffer: AVAudioPCMBuffer) -> ([String], Int, [[Float]]?,String) {
-        var segmentProbs: [Float] = []
-        var segmentPowers: [String] = []
-        var segments: [[Float]]?
-        var power: String = ""
-        
-        // Call cough_event_inference and other functions as needed
-        let (pred, probs) = coughEventInference(array)
-        print("prediction ",pred)
-        
-        if pred == 1 {
+        if(MyUserDefaults.getBool(forKey: Constants.isFirstSync)){
             
-            // Call cough_segment_inference and process the segments
-            (segments, segmentProbs) = PythonFunctions.coughSegmentInference(audioData: array, fs: fs, buffer: buffer)
+            uploadAllCoughs()
             
-            
-            if let segments = segments {
-                
-                // Calculate power for each segment
-                for wave in segments {
-                    let soundPower = PythonFunctions.powerByAVFoundation(wave,fs,buffer: buffer)
-                    power = PythonFunctions.calculateAdaptiveLoudness(loudness: soundPower, rspLoudness: rsp)
-                    print("Total Power",power)
-                    segmentPowers.append(power)
-                }
-                return (segmentPowers, segments.count, segments,power)
-            } else {
-                print("No segments or No cough segments...")
-                return ([], 0, nil,"")
-            }
-        } else {
-            print("Cough Not Found...")
-            return ([], 0, nil,"")
-        }
-    }
-    
-    
-    
-    
-    func coughEventInference(_ input: [Float]) -> (Int, Float) {
-        let x = padding(audioData: input)
-        
-        print("x----------",x.count)
-        
-        var cough = 0
-        var coughData:Float = 0.0
-        
-        if let modelPath = Bundle.main.path(forResource: "final_model_weights_no_optimization_v3", ofType: "tflite") {
-            
-            guard let interpreter = try? Interpreter(modelPath: modelPath) else {
-                fatalError("Error initializing interpreter")
-            }
-            
-            
-            try! interpreter.allocateTensors()
-            
-            
-            //                        let inputDetails = try! interpreter.input(at: 0)
-            //                        let outputDetails = try! interpreter.output(at: 0)
-            
-            
-            let data = Data(buffer: UnsafeBufferPointer(start: x, count: x.count))
-            
-            try! interpreter.copy(data, toInputAt: 0)
-            
-            // Invoke the model
-            try? interpreter.invoke()
-            
-            
-            guard let outputTensor = try? interpreter.output(at: 0) else {
-                fatalError("Error getting output data")
-            }
-            
-            let outputSize = outputTensor.shape.dimensions.reduce(1, {x, y in x * y})
-            
-            let outputData = UnsafeMutableBufferPointer<Float32>.allocate(capacity: outputSize)
-            outputTensor.data.copyBytes(to: outputData)
-            
-            //            let outputData = outputTensor.data.copyBytes(to: out)
-            
-            coughData = Float(outputData[0])
-            
-            print("cough data",coughData)
-            
-            //            cough = outputData[0] >= UInt8(0.80) ? (1, Float(outputData[0])) : (0, Float(outputData[0]))
-            
-            cough = coughData >= 0.80 ? 1 : 0
         }else{
             
-            print("not found")
+            print("upload first five",allCoughList.count)
+            uploaFirstFiveCoughs()
             
         }
         
         
-        return (cough,coughData)
     }
     
-    func padding(audioData: [Float]) -> [Float] {
-        let desiredLength = 44288
-        var audioData = Array(audioData.prefix(44100))
+    func uploadAllCoughs(){
         
-        if audioData.count < desiredLength {
-            let paddingCount = desiredLength - audioData.count
-            audioData.append(contentsOf: [Float](repeating: 0.0, count: paddingCount))
+        isSyncing = true
+        
+        ApiClient.shared.uploadSamples(allCoughList: allCoughList) { [self] response in
+            
+            isSyncing = false
+            
+            switch response {
+            case .success(_):
+                
+                MyUserDefaults.saveBool(forKey: Constants.isFirstSync, value: false)
+                isDeleteAllCough = true
+                
+                break
+            case .failure(_):
+                isDeleteAllCough = false
+                break
+            }
         }
         
-        return audioData
+        
     }
+    
+    
+    func uploaFirstFiveCoughs(){
+        
+        isSyncing = true
+        
+        ApiClient.shared.uploadSamples(allCoughList: allCoughList) { [self] response in
+            
+            isSyncing = false
+            
+            switch response {
+            case .success(_):
+                
+                isDeleteAllCough = true
+                
+                break
+            case .failure(_):
+                isDeleteAllCough = false
+                break
+            }
+        }
+        
+        
+    }
+    
+    
+    
+    
+    
+    
+   
     
     // Usage example
     //    let inputData = [Float](repeating: 0.0, count: 100) // Replace with your actual input data

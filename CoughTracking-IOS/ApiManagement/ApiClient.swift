@@ -183,39 +183,59 @@ class ApiClient {
     }
     
     
-    
-    
-    //        AF.request(url,method: .post,parameters: params,encoding: JSONEncoding.default,headers: tokenHeaders)
-    //            .responseJSON{ response in
-    //
-    //                print(response)
-    ////                switch response.result{
-    ////
-    ////                case.success(let data):
-    ////                    completion(.success(data))
-    ////                    break
-    ////                case.failure(let error):
-    ////
-    ////                    var apiError = ApiError()
-    ////                    apiError.msg = error.localizedDescription
-    ////
-    ////                    var errorResult = ErrorResult()
-    ////                    errorResult.detail = [apiError]
-    ////
-    ////                    completion(.failure(errorResult))
-    ////                    break
-    ////
-    ////                }
-    ////
-    //
-    //            }
-    
-    
-    
-    func uploadSamples(allCoughList:[VolunteerCough], completion: @escaping (Result<SendOtpResult, ErrorResult>) -> Void){
+    func uploadSamples(allCoughList:[VolunteerCough], completion: @escaping (Result<Int, ErrorResult>) -> Void){
         
         let url = baseUrl + "donate/recording"
         
+        AF.upload(multipartFormData: { multipartFormData in
+            for i in 0..<allCoughList.count {
+                
+                
+                let cough = allCoughList[i]
+                
+                let fileName = "\(i+1)_dry_\(cough.coughPower ?? "moderate")_\(DateUtills.getCurrentTimeInMilliseconds()).wav"
+                
+                print("uploadSamples",fileName)
+                
+                if let coughData = cough.coughSegments{
+                   
+                    do{
+                        
+                        let file = try Functions.saveWAVFileToDocumentsDirectory(floatArray: coughData, sampleRate: 22050, fileName: fileName)
+                        print("file",file)
+                        multipartFormData.append(file, withName: "files", fileName: fileName, mimeType: "audio/wav")
+                      
+                        
+                    }catch{
+                        
+                        print("error",error.localizedDescription)
+                        
+                    }
+                   
+                }
+            }
+        }, to: url, headers: tokenHeaders)
+        .responseDecodable(of:Int.self){ response in
+
+            switch response.result{
+
+            case.success(let data):
+                completion(.success(data))
+                break
+            case.failure(let error):
+
+                var apiError = ApiError()
+                apiError.msg = error.localizedDescription
+
+                var errorResult = ErrorResult()
+                errorResult.detail = [apiError]
+
+                completion(.failure(errorResult))
+                break
+
+            }
+
+        }
         
     }
     

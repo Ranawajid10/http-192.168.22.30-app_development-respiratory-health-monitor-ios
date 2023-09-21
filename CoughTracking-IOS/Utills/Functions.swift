@@ -27,6 +27,8 @@ class Functions{
         return formatter.string(from: date)
     }
     
+    
+    
     static func convertToAudioBuffer(floatArray: [[Float]], sampleRate: Double) -> AVAudioPCMBuffer? {
         let format = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sampleRate, channels: 1, interleaved: false)
         
@@ -43,6 +45,61 @@ class Functions{
         
         return nil
     }
+    
+    static  func saveWAVFileToDocumentsDirectory(floatArray: [[Float]], sampleRate: Double, fileName: String) throws -> URL {
+        let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let filePath = documentsDirectory.appendingPathComponent(fileName)
+        
+        do {
+            try convertFloatAudioToWAV(floatArray: floatArray, sampleRate: sampleRate, filePath: filePath)
+            return filePath
+        } catch {
+            throw error
+        }
+    }
+    
+    
+    
+    static  func convertFloatAudioToWAV(floatArray: [[Float]], sampleRate: Double, filePath: URL) throws {
+        
+        // Check if there is any audio data to write
+        guard !floatArray.isEmpty else {
+            print("Empty float array. Nothing to write.")
+            return
+        }
+        
+        // Define audio format
+        let channelCount = 1  // Mono
+        let audioFormat = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sampleRate, channels: AVAudioChannelCount(channelCount), interleaved: false)
+        
+        // Check if audio format is valid
+        guard let format = audioFormat else {
+            print("Invalid audio format.")
+            return
+        }
+        
+        do {
+            // Create an AVAudioFile for writing
+            let audioFile = try AVAudioFile(forWriting: filePath, settings: format.settings)
+            
+            // Create an AVAudioPCMBuffer
+            let frameCount = AVAudioFrameCount(floatArray[0].count)  // Use the frame count from one of the channels
+            let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frameCount)
+            buffer?.frameLength = frameCount
+            
+            // Loop through the elements of the floatArray and populate the buffer
+            for i in 0..<Int(buffer!.frameLength) {
+                buffer?.floatChannelData?[0][i] = floatArray[0][i]  // Assuming you're using the first channel
+            }
+            
+            
+            // Write the buffer to the audio file
+            try audioFile.write(from: buffer!)
+        } catch {
+            print("Error writing audio file: \(error.localizedDescription)")
+        }
+    }
+    
     
 }
 
