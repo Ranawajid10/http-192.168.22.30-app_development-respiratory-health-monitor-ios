@@ -7,6 +7,7 @@
 
 import Foundation
 import Alamofire
+import UIKit
 
 class ApiClient {
     
@@ -135,43 +136,80 @@ class ApiClient {
     }
     
     
-    func updateProfile(name:String, completion: @escaping (Result<SendOtpResult, ErrorResult>) -> Void){
+    func updateProfile(name:String,image:UIImage? = nil, completion: @escaping (Result<EditProfileResult, ErrorResult>) -> Void){
         
         let url = baseUrl + "info/profile"
         
-        
-        let params = [
-            "name": name,
-            "file": ""
+        var params = [
+            "name": name
         ] as [String : Any]
         
+        // Add image data to params if available
+        if let image = image, let imageData = image.jpegData(compressionQuality: 0.5) {
+            params["file"] = imageData
+        }
         
-        AF.request(url,method: .post,parameters: params,encoding: JSONEncoding.default,headers: tokenHeaders)
-            .responseJSON{ response in
+        AF.upload(multipartFormData: { multipartFormData in
+            for (key, value) in params {
+                if let stringValue = value as? String {
+                    multipartFormData.append(stringValue.data(using: .utf8)!, withName: key)
+                } else if let imageData = value as? Data {
+                    multipartFormData.append(imageData, withName: "file", fileName: "file.jpg", mimeType: "image/jpeg")
+                }
+            }
+        }, to: url, headers: tokenHeaders).responseDecodable(of:EditProfileResult.self){ response in
+            
+            switch response.result{
                 
-                print(response)
-//                switch response.result{
-//
-//                case.success(let data):
-//                    completion(.success(data))
-//                    break
-//                case.failure(let error):
-//
-//                    var apiError = ApiError()
-//                    apiError.msg = error.localizedDescription
-//
-//                    var errorResult = ErrorResult()
-//                    errorResult.detail = [apiError]
-//
-//                    completion(.failure(errorResult))
-//                    break
-//
-//                }
-//
+            case.success(let data):
+                completion(.success(data))
+                break
+            case.failure(let error):
+                
+                var apiError = ApiError()
+                apiError.msg = error.localizedDescription
+                
+                var errorResult = ErrorResult()
+                errorResult.detail = [apiError]
+                
+                completion(.failure(errorResult))
+                break
                 
             }
+            
+        }
+        
         
     }
+    
+    
+    
+    
+    //        AF.request(url,method: .post,parameters: params,encoding: JSONEncoding.default,headers: tokenHeaders)
+    //            .responseJSON{ response in
+    //
+    //                print(response)
+    ////                switch response.result{
+    ////
+    ////                case.success(let data):
+    ////                    completion(.success(data))
+    ////                    break
+    ////                case.failure(let error):
+    ////
+    ////                    var apiError = ApiError()
+    ////                    apiError.msg = error.localizedDescription
+    ////
+    ////                    var errorResult = ErrorResult()
+    ////                    errorResult.detail = [apiError]
+    ////
+    ////                    completion(.failure(errorResult))
+    ////                    break
+    ////
+    ////                }
+    ////
+    //
+    //            }
+    
     
     
     func uploadSamples(allCoughList:[VolunteerCough], completion: @escaping (Result<SendOtpResult, ErrorResult>) -> Void){

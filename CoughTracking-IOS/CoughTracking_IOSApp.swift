@@ -53,6 +53,11 @@ struct CoughTracking_IOSApp: App {
                         .environment(\.managedObjectContext, persistenceController.container.viewContext)
                     
                 }
+            }.onAppear{
+                
+                var ur = MyUserDefaults.getUserData() ?? LoginResult()
+                print("barear",ur.token)
+                
             }
         }
     }

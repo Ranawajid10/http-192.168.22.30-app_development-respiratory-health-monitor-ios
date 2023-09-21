@@ -140,7 +140,7 @@ struct DashboardView: View {
             }.onAppear{
                 
                 calculateTotalCoughHours()
-                dashboardVM.startRecording()
+//                dashboardVM.startRecording()
                 
                 
                 

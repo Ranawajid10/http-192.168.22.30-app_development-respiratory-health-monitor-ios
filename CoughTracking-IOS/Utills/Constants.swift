@@ -25,6 +25,7 @@ class Constants{
     static let isBaseLineSet : String =  "isBaseLineSet"
     static let baseLineLoudness : String =  "baseLineLoudness"
     static let userData : String =  "userData"
+    static let image : String =  "image"
     
     
     
