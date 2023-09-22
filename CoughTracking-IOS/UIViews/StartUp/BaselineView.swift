@@ -12,7 +12,6 @@ import AVFoundation
 struct BaselineView: View
 {
     
-    @EnvironmentObject var networkManager: NetworkManager
     @Environment(\.managedObjectContext) private var viewContext
     @StateObject private var baselineVM = BaselineVM()
     
@@ -60,9 +59,7 @@ struct BaselineView: View
                         .aspectRatio(contentMode: .fit)
                         .frame(height: 150)
                         .padding(.top, 30)
-                        .alignmentGuide(.bottom) { dimension in
-                            dimension[.bottom]
-                        }
+                        .scaleEffect(baselineVM.scaleIn ? 1.2 : 1.0) // Scale animation when recording
                 }
                 
                 HStack
@@ -154,7 +151,6 @@ struct BaselineView: View
             
             DashboardView()
                 .environment(\.managedObjectContext,viewContext)
-                .environmentObject(networkManager)
             
         })
         .toastView(toast: $toast)

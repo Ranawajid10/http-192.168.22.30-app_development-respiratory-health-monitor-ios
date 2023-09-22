@@ -92,7 +92,7 @@ class MyUserDefaults{
     
     static func getBearerToken() -> String {
         
-        var userData = getUserData() ?? LoginResult()
+        let userData = getUserData() ?? LoginResult()
         return userData.token ?? ""
     }
     

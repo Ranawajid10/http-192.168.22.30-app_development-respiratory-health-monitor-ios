@@ -240,4 +240,47 @@ class ApiClient {
     }
     
     
+    func socialLogin(loginWith:String,email:String,idToken:String,fcmToken:String, completion: @escaping (Result<Int, ErrorResult>) -> Void){
+     
+        
+        let url = baseUrl + "user/social/login"
+        
+        let params = [
+            "type_": loginWith,
+            "id_token": idToken,
+            "email": email,
+            "guid" : fcmToken
+        ] as [String : Any]
+        
+        
+        AF.request(url,method: .post,parameters: params,encoding: JSONEncoding.default,headers: simpleHeaders)
+            .responseJSON{ response in
+                
+                print("dadad",response,"-----",params)
+                
+//                switch response.result{
+//
+//                case.success(let data):
+//                    completion(.success(data))
+//                    break
+//                case.failure(let error):
+//
+//                    var apiError = ApiError()
+//                    apiError.msg = error.localizedDescription
+//
+//                    var errorResult = ErrorResult()
+//                    errorResult.detail = [apiError]
+//
+//                    completion(.failure(errorResult))
+//                    break
+//
+//                }
+//
+                
+            }
+        
+        
+        
+    }
+    
 }

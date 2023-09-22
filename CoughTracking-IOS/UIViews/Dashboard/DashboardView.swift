@@ -18,7 +18,6 @@ struct DashboardView: View {
     @State var allCoughList:[Cough] = []
     
     
-    @EnvironmentObject var networkManager: NetworkManager
     @Environment(\.managedObjectContext) private var viewContext
     
     @StateObject var dashboardVM = DashboardVM()
@@ -90,7 +89,6 @@ struct DashboardView: View {
                 }
                 
                 CustomTabView(dashboardVM: dashboardVM, showMicSheet: $showMicStopSheet)
-                    .environmentObject(networkManager)
                 
                 
             }
@@ -369,7 +367,6 @@ struct DashboardView: View {
 
 struct CustomTabView:View{
     
-    @EnvironmentObject var networkManager: NetworkManager
     @StateObject var dashboardVM : DashboardVM
     @Environment(\.managedObjectContext) private var viewContext
     @Binding var showMicSheet:Bool
@@ -414,7 +411,6 @@ struct CustomTabView:View{
                     NavigationLink {
                         
                         ProfileSettingsView(dashboardVM: dashboardVM)
-                            .environmentObject(networkManager)
                             .environment(\.managedObjectContext, viewContext)
                         
                     } label: {

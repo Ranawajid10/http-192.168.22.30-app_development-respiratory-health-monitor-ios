@@ -12,7 +12,6 @@ struct SendOtpView: View
 {
     
     @Environment(\.managedObjectContext) private var viewContext
-    @EnvironmentObject var networkManager: NetworkManager
     @State private var toast: FancyToast? = nil
     
     @ObservedObject var sendOtpVM = SendOtpVM()
@@ -33,7 +32,8 @@ struct SendOtpView: View
                         
                         Image("logosmall")
                             .resizable()
-                            .frame(width: 120,height: 120)
+                            .aspectRatio(contentMode: .fit)
+                            .frame(height: 120)
                             .padding(.top, 30)
                         
                         HStack{
@@ -47,11 +47,20 @@ struct SendOtpView: View
                             Spacer()
                             
                         }
-                        Group {
-                            Text("Please enter the OTP that is sent to your email address ")
-                                .foregroundColor(Color.greyColor) +
-                            Text("\"\(sendOtpVM.email)\"")
-                                .foregroundColor(Color.appColorBlue)
+                        
+                        
+                        HStack {
+                            
+                            Group {
+                                Text("Please enter the OTP that is sent to your email address ")
+                                    .foregroundColor(Color.greyColor) +
+                                Text("\"\(sendOtpVM.email)\"")
+                                    .foregroundColor(Color.appColorBlue)
+                            }
+                            
+                            Spacer()
+                            
+                            
                         }
                         .modifier(LatoFontModifier(fontWeight: .regular, fontSize: 16))
                         .padding(.top, 10)
@@ -119,9 +128,10 @@ struct SendOtpView: View
                                 
                                 MyUserDefaults.saveBool(forKey:Constants.isLoggedIn, value: true)
                                 MyUserDefaults.saveBool(forKey:Constants.isBaseLineSet, value: false)
+                                MyUserDefaults.saveBool(forKey:Constants.isAllowSync, value: false)
                                 MyUserDefaults.saveString(forKey:Constants.email, value: sendOtpVM.email)
                                 MyUserDefaults.saveInt(forKey:Constants.otp, value: sendOtpVM.mailOTP)
-                            
+                                
                                 sendOtpVM.goNext = true
                                 
                             }else if(sendOtpVM.enteredOTP == 0){
@@ -165,7 +175,7 @@ struct SendOtpView: View
                 LoadingView()
                     .onAppear{
                         
-                        DispatchQueue.main.asyncAfter(deadline: .now()+0.7){
+                        DispatchQueue.main.asyncAfter(deadline: .now()+0.6){
                             
                             UIApplication.shared.endEditing()
                             
@@ -178,9 +188,11 @@ struct SendOtpView: View
         }.environment(\.managedObjectContext,viewContext)
             .navigationDestination(isPresented: $sendOtpVM.goNext, destination: {
                 
-                BaselineView()
-                    .environmentObject(networkManager)
+                AllowSyncStatsView(text: "Continue")
                     .environment(\.managedObjectContext,viewContext)
+                
+                //                BaselineView()
+                //                    .environment(\.managedObjectContext,viewContext)
                 
             }).onReceive(sendOtpVM.$isEmailSent, perform: { i in
                 
@@ -203,7 +215,10 @@ struct SendOtpView: View
                 sendOtpVM.email = email
                 sendOtpVM.fcmToken = fcmToken
                 sendOtpVM.loginWith = loginWith
-
+                
+                print("email",email,"--",sendOtpVM.email)
+                
+                
                 sendOtpVM.sendOtpToMail()
                 
             }

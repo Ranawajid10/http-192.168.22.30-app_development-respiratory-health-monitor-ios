@@ -10,12 +10,13 @@ import PythonKit
 import Firebase
 import CoreData
 import AVFoundation
+import GoogleSignIn
 
 @main
 struct CoughTracking_IOSApp: App {
     
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     let persistenceController = PersistenceController.shared
-    @StateObject var networkManager = NetworkManager()
    
     init(){
         
@@ -35,28 +36,31 @@ struct CoughTracking_IOSApp: App {
                     if(MyUserDefaults.getBool(forKey: Constants.isBaseLineSet)){
                         
                         DashboardView()
-                            .environmentObject(networkManager)
                             .environment(\.managedObjectContext, persistenceController.container.viewContext)
                         
+                    }else if(!MyUserDefaults.getBool(forKey: Constants.isAllowSync)){
+                        
+                        AllowSyncStatsView(text: "Continue" )
+                            .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                   
                     }else{
                         
                         BaselineView()
-                            .environmentObject(networkManager)
                             .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                        
                     }
                     
                     
                 }else{
                     
                     SplashView()
-                        .environmentObject(networkManager)
                         .environment(\.managedObjectContext, persistenceController.container.viewContext)
                     
                 }
             }.onAppear{
                 
                 MyUserDefaults.saveBool(forKey: Constants.isMicStopbyUser, value: false)
-                var ur = MyUserDefaults.getUserData() ?? LoginResult()
+                let ur = MyUserDefaults.getUserData() ?? LoginResult()
                 print("barear",ur.token ?? "")
                 
             }
@@ -79,7 +83,20 @@ struct CoughTracking_IOSApp: App {
     
     func initializeFirebase(){
         
+        print("jjjjj")
+
         FirebaseApp.configure()
+    
+        guard let clientID = FirebaseApp.app()?.options.clientID else {
+            print("jjjjj")
+            
+            return }
+
+        print("kkk",clientID)
+        // Create Google Sign In configuration object.
+        let config = GIDConfiguration(clientID: clientID)
+//        let config = GIDConfiguration(clientID: Constants.googleClientID)
+        GIDSignIn.sharedInstance.configuration = config
         
         do {
             let session = AVAudioSession.sharedInstance()
@@ -90,4 +107,14 @@ struct CoughTracking_IOSApp: App {
         }
         
     }
+}
+
+class AppDelegate: UIResponder, UIApplicationDelegate {
+    
+    func application(_ app: UIApplication,
+                     open url: URL,
+                     options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+      return GIDSignIn.sharedInstance.handle(url)
+    }
+    
 }

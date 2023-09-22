@@ -22,7 +22,7 @@ struct HourlyCoughsView: View {
     @State private var currentHour = Calendar.current.component(.hour, from: Date())
     @Environment(\.managedObjectContext) private var viewContext
     
-//    @FetchRequest(entity: Cough.entity(), sortDescriptors: []) var coughFetchResult: FetchedResults<Cough>
+    //    @FetchRequest(entity: Cough.entity(), sortDescriptors: []) var coughFetchResult: FetchedResults<Cough>
     
     
     @State var moderateTimeData: [String: Int] = [:]
@@ -38,7 +38,7 @@ struct HourlyCoughsView: View {
     let array = ["05:00", "10:00", "15:00", "20:00", "25:00", "30:00",
                  "35:00", "40:00", "45:00", "50:00", "55:00", "60:00"]
     
-   
+    
     
     var body: some View {
         
@@ -64,7 +64,7 @@ struct HourlyCoughsView: View {
                     HourlyGraphView(moderateCoughData: $sortedModerateTimeDataDictionary, severeCoughData: $sortedSevereTimeDataDictionary)
                         .frame(height: 350)
                         .id(changeGraph)
-                   
+                    
                     
                     HStack{
                         
@@ -76,67 +76,71 @@ struct HourlyCoughsView: View {
                             .padding(.trailing)
                         
                     }
-                    HStack{
-                        
-                        Image("help")
-                            .resizable()
-                            .frame(width: 24,height: 24)
-                        
-                        Text("Volunteer Participation")
-                            .foregroundColor(Color.black90)
-                            .font(.system(size: 18))
-                            .bold()
-                        
-                        Spacer()
-                        
-                    }.padding(.horizontal,24)
-                        .padding(.top,10)
                     
-                    Text("Your volunteer participation by donating only your cough samples will help efforts to improve healthcare services globally. Please take a step ahead and play your part.")
-                        .foregroundColor(Color.darkBlue)
-                        .font(.system(size: 14))
-                        .padding(.horizontal,8)
-                        .multilineTextAlignment(.leading)
-                    
-                    
-                    
-                    NavigationLink {
+                    if(MyUserDefaults.getBool(forKey: Constants.isAutoDonate)){
                         
-                        if(userData.age==nil && userData.gender==nil && userData.ethnicity==nil){
-                         
-                            BecomeVolunteerView(dashboardVM: dashboardVM, allCoughList: $allCoughList)
-                                .environment(\.managedObjectContext, viewContext)
+                        HStack{
                             
-                        }else{
+                            Image("help")
+                                .resizable()
+                                .frame(width: 24,height: 24)
                             
-                            VolunteerParticipationView()
-                                .environment(\.managedObjectContext, viewContext)
-                                .onAppear{
-                                    
-                                    dashboardVM.stopRecording()
-                                    
-                                }.onDisappear{
-                                    
-                                    if(!MyUserDefaults.getBool(forKey: Constants.isMicStopbyUser)){
-                                        dashboardVM.startRecording()
+                            Text("Volunteer Participation")
+                                .foregroundColor(Color.black90)
+                                .font(.system(size: 18))
+                                .bold()
+                            
+                            Spacer()
+                            
+                        }.padding(.horizontal,24)
+                            .padding(.top,10)
+                        
+                        Text("Your volunteer participation by donating only your cough samples will help efforts to improve healthcare services globally. Please take a step ahead and play your part.")
+                            .foregroundColor(Color.darkBlue)
+                            .font(.system(size: 14))
+                            .padding(.horizontal,8)
+                            .multilineTextAlignment(.leading)
+                        
+                        
+                        
+                        NavigationLink {
+                            
+                            if(userData.age==nil && userData.gender==nil && userData.ethnicity==nil){
+                                
+                                BecomeVolunteerView(dashboardVM: dashboardVM, allCoughList: $allCoughList)
+                                    .environment(\.managedObjectContext, viewContext)
+                                
+                            }else{
+                                
+                                VolunteerParticipationView()
+                                    .environment(\.managedObjectContext, viewContext)
+                                    .onAppear{
+                                        
+                                        dashboardVM.stopRecording()
+                                        
+                                    }.onDisappear{
+                                        
+                                        if(!MyUserDefaults.getBool(forKey: Constants.isMicStopbyUser)){
+                                            dashboardVM.startRecording()
+                                        }
                                     }
-                                }
+                                
+                            }
                             
-                        }
+                        } label: {
+                            
+                            
+                            Text("I want to volunteer")
+                                .font(.system(size: 16))
+                                .foregroundColor(Color.white)
+                                .frame(width: UIScreen.main.bounds.width-60,height: 42)
+                                .background(Color.appColorBlue)
+                                .cornerRadius(40)
+                            
+                            
+                        }.padding(.top)
                         
-                    } label: {
-                        
-                        
-                        Text("I want to volunteer")
-                            .font(.system(size: 16))
-                            .foregroundColor(Color.white)
-                            .frame(width: UIScreen.main.bounds.width-60,height: 42)
-                            .background(Color.appColorBlue)
-                            .cornerRadius(40)
-                        
-                        
-                    }.padding(.top)
-                    
+                    }
                     
                     Spacer()
                     
@@ -157,7 +161,7 @@ struct HourlyCoughsView: View {
             getGraphData()
             
         }.onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextObjectsDidChange)) { _ in
-           
+            
             getGraphData()
             
         }
@@ -219,11 +223,11 @@ struct HourlyCoughsView: View {
             }
         }
         
-
+        
         // Create a new dictionary with sorted keys and their corresponding values
         sortedModerateTimeDataDictionary.removeAll()
         sortedSevereTimeDataDictionary.removeAll()
-
+        
         let moderateList = moderateTimeData.sorted { v1, v2 in
             
             let a = v1.key.dropLast(3)
@@ -233,7 +237,7 @@ struct HourlyCoughsView: View {
         }
         
         sortedModerateTimeDataDictionary = moderateList
-            
+        
         
         let severeList = severeTimeData.sorted { v1, v2 in
             
@@ -244,12 +248,12 @@ struct HourlyCoughsView: View {
         }
         
         sortedSevereTimeDataDictionary = severeList
-           
-//        withAnimation {
-            
-            changeGraph+=1
-            
-//        }
+        
+        //        withAnimation {
+        
+        changeGraph+=1
+        
+        //        }
         
         
         print("Graph Data",currentDateCoughs.count,"---",times.count,"---Moderate---",sortedModerateTimeDataDictionary,"---Severe---",sortedSevereTimeDataDictionary)

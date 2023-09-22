@@ -59,67 +59,71 @@ struct WeeklyCoughsView: View {
                             .padding(.trailing)
                         
                     }
-                    HStack{
-                        
-                        Image("help")
-                            .resizable()
-                            .frame(width: 24,height: 24)
-                        
-                        Text("Volunteer Participation")
-                            .foregroundColor(Color.black90)
-                            .font(.system(size: 18))
-                            .bold()
-                        
-                        Spacer()
-                        
-                    }.padding(.horizontal,24)
-                        .padding(.top,10)
                     
-                    Text("Your volunteer participation by donating only your cough samples will help efforts to improve healthcare services globally. Please take a step ahead and play your part.")
-                        .foregroundColor(Color.darkBlue)
-                        .font(.system(size: 14))
-                        .padding(.horizontal,8)
-                        .multilineTextAlignment(.leading)
-                    
-                    
-                    
-                    NavigationLink {
-                        
-                        if(userData.age==nil && userData.gender==nil && userData.ethnicity==nil){
-                         
-                            BecomeVolunteerView(dashboardVM: dashboardVM, allCoughList: $allCoughList)
-                                .environment(\.managedObjectContext, viewContext)
+                    if(MyUserDefaults.getBool(forKey: Constants.isAutoDonate)){
+                        HStack{
                             
-                        }else{
+                            Image("help")
+                                .resizable()
+                                .frame(width: 24,height: 24)
                             
-                            VolunteerParticipationView()
-                                .environment(\.managedObjectContext, viewContext)
-                                .onAppear{
-                                    
-                                    dashboardVM.stopRecording()
-                                    
-                                }.onDisappear{
-                                    
-                                    if(!MyUserDefaults.getBool(forKey: Constants.isMicStopbyUser)){
-                                        dashboardVM.startRecording()
+                            Text("Volunteer Participation")
+                                .foregroundColor(Color.black90)
+                                .font(.system(size: 18))
+                                .bold()
+                            
+                            Spacer()
+                            
+                        }.padding(.horizontal,24)
+                            .padding(.top,10)
+                        
+                        Text("Your volunteer participation by donating only your cough samples will help efforts to improve healthcare services globally. Please take a step ahead and play your part.")
+                            .foregroundColor(Color.darkBlue)
+                            .font(.system(size: 14))
+                            .padding(.horizontal,8)
+                            .multilineTextAlignment(.leading)
+                        
+                        
+                        
+                        NavigationLink {
+                            
+                            if(userData.age==nil && userData.gender==nil && userData.ethnicity==nil){
+                                
+                                BecomeVolunteerView(dashboardVM: dashboardVM, allCoughList: $allCoughList)
+                                    .environment(\.managedObjectContext, viewContext)
+                                
+                            }else{
+                                
+                                VolunteerParticipationView()
+                                    .environment(\.managedObjectContext, viewContext)
+                                    .onAppear{
+                                        
+                                        dashboardVM.stopRecording()
+                                        
+                                    }.onDisappear{
+                                        
+                                        if(!MyUserDefaults.getBool(forKey: Constants.isMicStopbyUser)){
+                                            dashboardVM.startRecording()
+                                        }
+                                        
                                     }
-                                    
-                                }
+                                
+                            }
                             
-                        }
+                        } label: {
+                            
+                            
+                            Text("I want to volunteer")
+                                .font(.system(size: 16))
+                                .foregroundColor(Color.white)
+                                .frame(width: UIScreen.main.bounds.width-60,height: 42)
+                                .background(Color.appColorBlue)
+                                .cornerRadius(40)
+                            
+                            
+                        }.padding(.top)
                         
-                    } label: {
-                        
-                        
-                        Text("I want to volunteer")
-                            .font(.system(size: 16))
-                            .foregroundColor(Color.white)
-                            .frame(width: UIScreen.main.bounds.width-60,height: 42)
-                            .background(Color.appColorBlue)
-                            .cornerRadius(40)
-                        
-                        
-                    }.padding(.top)
+                    }
                     
                     Spacer()
                     

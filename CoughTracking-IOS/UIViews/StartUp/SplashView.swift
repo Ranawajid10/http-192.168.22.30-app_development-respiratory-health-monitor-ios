@@ -13,7 +13,6 @@ import CoreData
 struct SplashView: View
 {
     @Environment(\.managedObjectContext) private var viewContext
-    @EnvironmentObject var networkManager: NetworkManager
     @State private var animate = false
     @State private var goToNextScreen = false
     @State private var isActive = false
@@ -32,7 +31,6 @@ struct SplashView: View
                 
                 GetStartedView()
                     .environment(\.managedObjectContext,viewContext)
-                    .environmentObject(networkManager)
                     
             }else{
                 
@@ -71,7 +69,6 @@ struct SplashView: View
             animated()
         
         }.environment(\.managedObjectContext,viewContext)
-        .environmentObject(networkManager)
         .background(Color.white.edgesIgnoringSafeArea(.all))
         .navigationBarHidden(true)
        

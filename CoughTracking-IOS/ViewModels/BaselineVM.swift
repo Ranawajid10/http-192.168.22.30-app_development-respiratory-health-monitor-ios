@@ -19,6 +19,7 @@ import Combine
 
 class BaselineVM:ObservableObject{
     
+    @Published var scaleIn = false
     @Published var goNext = false
     @Published var isLoading = false
     @Published var isError = false
@@ -92,21 +93,46 @@ class BaselineVM:ObservableObject{
     
     
     func startTimer() {
+        
+            Timer.scheduledTimer(withTimeInterval: 0.60, repeats: true) { [self] _ in
+                
+                if(isTimerRunning){
+                    withAnimation(.easeInOut(duration: 0.6)) {
+                        self.scaleIn.toggle()
+                    }
+                }else{
+                    
+                    self.timer?.invalidate()
+                    
+                }
+            }
+
+        
         cancellable = Timer
             .publish(every: 1, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 
+                //                withAnimation(.easeInOut(duration: 0.5)) {
+                //
+                //                    self.scaleIn.toggle()
+                //
+                //                }
+                
                 if self.counter < 2 {
                     self.counter += 1
                     self.remainingTime = 2 - self.counter
+                    
+                    
+                    
                 } else {
                     self.timer?.invalidate()
                     self.isTimerRunning = false
                     self.stopRecording() // Call the function when the timer ends
                 }
             }
+        
         
         requestMicrophonePermission() // Call the function when the timer starts
     }

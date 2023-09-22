@@ -10,7 +10,6 @@ import CoreData
 
 struct ProfileSettingsView: View {
     
-    @EnvironmentObject var networkManager: NetworkManager
     @StateObject var dashboardVM:DashboardVM
     @Environment(\.managedObjectContext) private var viewContext
     @State var isSyncData = false
@@ -91,22 +90,32 @@ struct ProfileSettingsView: View {
                     }.padding(.top)
                     
                     
-                    
-                    HStack{
+                    NavigationLink {
                         
-                        Image("folder")
+                        AllowSyncStatsView(text: "Save")
                         
+                    } label: {
                         
-                        
-                        
-                        Toggle(isOn: $isSyncData) {
+                        HStack{
+                            
+                            Image(systemName:"cloud")
+                                .resizable()
+                                .frame(width: 24,height: 20)
+                                .foregroundColor(Color.black)
+                            
+                            
                             Text("Synchronise data")
                                 .modifier(LatoFontModifier(fontWeight: .regular, fontSize: 16))
                                 .foregroundColor(.black)
                             
+                            
+                            Spacer()
+                            
                         }
                         
                     }.padding(.top)
+                    
+                    
                     
                     
                     
@@ -202,7 +211,7 @@ struct ProfileSettingsView: View {
             }.navigationDestination(isPresented: $goGetStarted) {
                 
                 GetStartedView()
-                    .environmentObject(networkManager)
+                    .environment(\.managedObjectContext,viewContext)
                 
             }.onAppear{
                 
@@ -224,9 +233,21 @@ struct ProfileSettingsView: View {
         MyUserDefaults.saveBool(forKey: Constants.isBaseLineSet, value: false)
         MyUserDefaults.saveFloat(forKey: Constants.baseLineLoudness, value: 0.0)
         
+        MyUserDefaults.saveBool(forKey: Constants.isAllowSync, value: false)
+        MyUserDefaults.saveBool(forKey: Constants.isAutoSync, value: false)
+        MyUserDefaults.saveBool(forKey: Constants.isAutoDonate, value: false)
+        MyUserDefaults.saveBool(forKey: Constants.isDonateForResearch, value: false)
+        MyUserDefaults.saveBool(forKey: Constants.isShareWithDoctor, value: false)
+        MyUserDefaults.saveString(forKey: Constants.shareWithDoctor, value:  Constants.syncOptionsList[1])
+        MyUserDefaults.saveString(forKey: Constants.donateForResearch, value:  Constants.syncOptionsList[1])
+        
+        
+        
+        
         deleteCoughData()
         deleteBaseLinehData()
-        
+        deleteVolunteer()
+        deleteTrackedHour()
         
         
         isLoading = false
@@ -259,6 +280,35 @@ struct ProfileSettingsView: View {
             print("Error deleting data: \(error)")
         }
     }
+    
+    func deleteVolunteer() {
+        
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "VolunteerCough")
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        
+        do {
+            try viewContext.execute(deleteRequest)
+            try viewContext.save()
+        } catch {
+            print("Error deleting data: \(error)")
+        }
+    }
+    
+    
+    func deleteTrackedHour() {
+        
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "CoughTrackingHours")
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        
+        do {
+            try viewContext.execute(deleteRequest)
+            try viewContext.save()
+        } catch {
+            print("Error deleting data: \(error)")
+        }
+    }
+    
+    
 }
 
 struct CustomAlertView: View {

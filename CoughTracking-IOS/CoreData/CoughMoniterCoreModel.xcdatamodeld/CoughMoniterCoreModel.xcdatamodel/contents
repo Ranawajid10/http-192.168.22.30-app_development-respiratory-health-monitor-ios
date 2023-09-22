@@ -2,7 +2,7 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21754" systemVersion="22G91" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Cough" representedClassName="Cough" syncable="YES" codeGenerationType="class">
         <attribute name="coughPower" optional="YES" attributeType="String"/>
-        <attribute name="coughSegments" optional="YES" attributeType="Transformable" customClassName="[[Float]]"/>
+        <attribute name="coughSegments" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[[Float]]"/>
         <attribute name="date" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="String"/>
         <attribute name="time" optional="YES" attributeType="String"/>

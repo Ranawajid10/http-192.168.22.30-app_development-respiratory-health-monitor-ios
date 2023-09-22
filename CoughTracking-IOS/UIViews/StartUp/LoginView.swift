@@ -12,9 +12,9 @@ struct LoginView: View
     
     @Environment(\.managedObjectContext) private var viewContext
     @State private var showPasswordError: Bool = false
-    @EnvironmentObject var networkManager: NetworkManager
-    @ObservedObject var loginVM:LoginVM
+    @ObservedObject var loginVM = LoginVM()
     
+    @State private var toast: FancyToast? = nil
     
     @State private var isOtpView = false
     
@@ -22,20 +22,16 @@ struct LoginView: View
     @State private var isgoogle = false
     @State private var istwitter = false
     
-    init(networkManager: NetworkManager) {
-        
-        self.loginVM = LoginVM(networkManager: networkManager)
-        
-    }
     
     var body: some View {
         ZStack{
-            ScrollView{
+            
+            ScrollView(showsIndicators: false){
                 VStack(spacing: 20) {
                     Image("logosmall")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(height: 60)
+                        .frame(height: 120)
                         .alignmentGuide(.top) { dimension in
                             dimension[.top]
                         }
@@ -73,7 +69,7 @@ struct LoginView: View
                         
                         
                     }
-                    .padding(.top, 100)
+                    .padding(.top, 50)
                     
                     Image("or_proceed_with_text")
                         .resizable()
@@ -84,17 +80,6 @@ struct LoginView: View
                     Spacer()
                     
                     HStack(spacing: 20) {
-                        Button(action: {
-                            
-                            loginVM.loginWith = Constants.facebook
-                            loginVM.checkLogin()
-                            
-                        }) {
-                            Image("facebook_img")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 100, height:40)
-                        }
                         
                         Button(action: {
                             
@@ -108,6 +93,19 @@ struct LoginView: View
                                 .frame(width: 100, height:40)
                         }
                         
+                        Button(action: {
+                            
+                            loginVM.loginWith = Constants.facebook
+                            loginVM.checkLogin()
+                            
+                        }) {
+                            Image("facebook_img")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 100, height:40)
+                        }
+                        
+                        
                         Button {
                             
                             loginVM.loginWith = Constants.twitter
@@ -119,40 +117,53 @@ struct LoginView: View
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 100, height:40)
                         }
-
-                      
+                        
+                        
                     }
                     
+                    Spacer()
                     
                 }
-                .environmentObject(networkManager)
                 .padding()
-                .navigationTitle("")
             }
-        }.environment(\.managedObjectContext,viewContext)
-        .navigationDestination(isPresented: $loginVM.navigateToOTP, destination: {
             
-            SendOtpView(email: loginVM.email, fcmToken: loginVM.fcmToken, loginWith: loginVM.loginWith)
-                .environmentObject(networkManager)
-                .environment(\.managedObjectContext,viewContext)
             
-        })
-        .background(Color.screenBG)
-            .alert(isPresented: $loginVM.isError, content: {
+            if(loginVM.isLoading){
                 
-                Alert(title: Text("Error occurred!"), message: Text(loginVM.errorMessage), dismissButton: .default(Text("OK")))
+                LoadingView()
+                
+            }
+            
+        }.navigationTitle("")
+        .toastView(toast: $toast)
+            .environment(\.managedObjectContext,viewContext)
+            .navigationDestination(isPresented: $loginVM.navigateToOTP, destination: {
+                
+                SendOtpView(email: loginVM.email, fcmToken: loginVM.fcmToken, loginWith: loginVM.loginWith)
+                    .environment(\.managedObjectContext,viewContext)
                 
             })
-            .dismissKeyboardOnTap()
+            .background(Color.screenBG)
+            .onReceive(loginVM.$isError, perform: { i in
+                
+                if(i){
+                    
+                    toast = FancyToast(type: .error, title: "Error occurred!", message: loginVM.errorMessage)
+                    loginVM.isError = false
+                    
+                }
+                
+            }).dismissKeyboardOnTap()
             .customAlert(isPresented: $loginVM.showNoInternetAlert) {
                 
-                NoAlertView{
+                NoInternetAlertView{
                     
                     loginVM.checkLogin()
                     
                 }
                 
             }
+            
     }
     
     
