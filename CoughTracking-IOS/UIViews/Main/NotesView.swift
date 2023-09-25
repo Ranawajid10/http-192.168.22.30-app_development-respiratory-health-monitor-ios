@@ -13,6 +13,7 @@ import AVFoundation
 
 struct NotesView: View {
     
+    @ObservedObject  var dashboardVM:DashboardVM
     @Environment(\.managedObjectContext) private var viewContext
     @State private var selectedDate = Date()
     @State private var showAddNoteSheet = false
@@ -81,6 +82,7 @@ struct NotesView: View {
         }.toastView(toast: $toast)
             .background(Color.screenBG)
             .navigationTitle("Notes")
+            .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showAddNoteSheet) {
                 
                 AddNoteSheetView(showNoteSheet: $showAddNoteSheet, isNoteAdded: $isNoteAdded,selectedDate:$selectedDate,selectedHour:$selectedHour)
@@ -95,7 +97,7 @@ struct NotesView: View {
             }
             .sheet(isPresented: $showCoughAndNoteSheet) {
                 
-                CoughsAndNotesSheetView(currentDateCoughsList: $currentDateCoughsList, currentDateNotesList: $currentDateNotesList, selectedCoughsList: $selectedCoughsList, updateNotesRow: $updateRow)
+                CoughsAndNotesSheetView(dashboardVM: dashboardVM, currentDateCoughsList: $currentDateCoughsList, currentDateNotesList: $currentDateNotesList, selectedCoughsList: $selectedCoughsList, updateNotesRow: $updateRow)
                     .environment(\.managedObjectContext, viewContext)
                     .presentationDetents([.medium,.large])
                 
@@ -510,6 +512,8 @@ struct CoughsAndNotesSheetView:View{
     @Environment(\.managedObjectContext) private var viewContext
     @State var note:String = ""
     @State var selectedIndex:Int = 0
+    
+    @ObservedObject  var dashboardVM:DashboardVM
     @Binding var currentDateCoughsList:[Cough]
     @Binding var currentDateNotesList:[Notes]
     @Binding var selectedCoughsList:[Cough]
@@ -609,7 +613,7 @@ struct CoughsAndNotesSheetView:View{
             
             if(selectedIndex == 0){
                 
-                CoughsNotesView(currentDateCoughsList: $currentDateCoughsList, selectedCoughsList: $selectedCoughsList)
+                CoughsNotesView(dashboardVM: dashboardVM, currentDateCoughsList: $currentDateCoughsList, selectedCoughsList: $selectedCoughsList)
                 
             }else{
                 
@@ -785,10 +789,10 @@ struct MultiChannelWaveformView: View {
 struct CoughsNotesView:View{
     
     
+    @ObservedObject  var dashboardVM:DashboardVM
     @Binding var currentDateCoughsList:[Cough]
     @Binding var selectedCoughsList:[Cough]
     
-    @ObservedObject var audioPlayerManager = AudioPlayerManager()
     
     @State var isPlaying = false
     @State var playingPosition = 0
@@ -842,12 +846,12 @@ struct CoughsNotesView:View{
                                     if isPlaying && playingPosition == index {
                                         
                                         // Pause the audio
-                                        audioPlayerManager.pauseAudio()
+                                        dashboardVM.pauseAudio()
                                         
                                     } else {
                                         
                                         // Play the audio
-                                        playSample(cough: cough)
+                                        dashboardVM.playSample(floatArray: cough.coughSegments ?? [])
                                         
                                     }
                                     
@@ -944,102 +948,80 @@ struct CoughsNotesView:View{
     }
     
     
-    func playSample(cough:Cough){
-        
-        NotificationCenter.default.post(name: .audioPlayerProgressNotification, object: 0)
-        
-        
-        do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .default)
-            try session.setActive(true)
-        } catch {
-            print("Error setting up AVAudioSession: \(error.localizedDescription)")
-        }
-        
-        if let audioBuffer = Functions.convertToAudioBuffer(floatArray: cough.coughSegments ?? [], sampleRate: 22050) {
-            
-            audioPlayerManager.playAudio(buffer: audioBuffer)
-            
-        }
-        
-        
-        
-        
-    }
+    
     
 }
 
-class AudioPlayerManager: ObservableObject {
-    private var engine = AVAudioEngine()
-    private var player = AVAudioPlayerNode()
-    
-    @Published var playbackProgress: Double = 0.0 // Publish playback progress
-    @Published var isPlaying: Bool = false
-    
-    
-    private var timer: Timer?
-    
-    func playAudio(buffer: AVAudioPCMBuffer) {
-        do {
-            engine.attach(player)
-            engine.connect(player, to: engine.mainMixerNode, format: buffer.format)
-            
-            player.scheduleBuffer(buffer, completionHandler: nil)
-            
-            try engine.start()
-            
-            // Start the audio player
-            player.play()
-            
-            // Create a timer to update playbackProgress in real-time
-            timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-                guard let self = self else { return }
-                if self.player.isPlaying {
-                    if let lastRenderTime = self.player.lastRenderTime,
-                       let playerTime = self.player.playerTime(forNodeTime: lastRenderTime) {
-                        // Calculate the current playback progress within the range [0, 1]
-                        let currentTime = Double(playerTime.sampleTime) / Double(playerTime.sampleRate)
-                        let totalDuration = Double(buffer.frameLength) / buffer.format.sampleRate
-                        //                        let progress = min(1.0, max(0.0, currentTime / totalDuration))
-                        let progress = currentTime / totalDuration
-                        
-                        self.playbackProgress = progress
-                        
-                        print("adada",progress)
-                        
-                        self.isPlaying = true
-                        
-                        // Post the progress notification only if not completed
-                        
-                        NotificationCenter.default.post(name: .audioPlayerProgressNotification, object: progress)
-                        
-                        
-                        if progress > 1.0 {
-                            
-                            self.isPlaying = false
-                            self.timer?.invalidate()
-                            
-                        }
-                    }
-                } else {
-                    // Audio playback has finished, invalidate the timer
-                    self.isPlaying = false
-                    self.timer?.invalidate()
-                }
-            }
-        } catch {
-            self.isPlaying = false
-            print("Error playing audio: \(error.localizedDescription)")
-        }
-    }
-    
-    func pauseAudio() {
-        player.pause()
-    }
-    
-    
-}
+//class AudioPlayerManager: ObservableObject {
+//    private var engine = AVAudioEngine()
+//    private var player = AVAudioPlayerNode()
+//    
+//    @Published var playbackProgress: Double = 0.0 // Publish playback progress
+//    @Published var isPlaying: Bool = false
+//    
+//    
+//    private var timer: Timer?
+//    
+//    func playAudio(buffer: AVAudioPCMBuffer) {
+//        do {
+//            engine.attach(player)
+//            engine.connect(player, to: engine.mainMixerNode, format: buffer.format)
+//            
+//            player.scheduleBuffer(buffer, completionHandler: nil)
+//            
+//            try engine.start()
+//            
+//            // Start the audio player
+//            player.play()
+//            
+//            // Create a timer to update playbackProgress in real-time
+//            timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+//                guard let self = self else { return }
+//                if self.player.isPlaying {
+//                    if let lastRenderTime = self.player.lastRenderTime,
+//                       let playerTime = self.player.playerTime(forNodeTime: lastRenderTime) {
+//                        // Calculate the current playback progress within the range [0, 1]
+//                        let currentTime = Double(playerTime.sampleTime) / Double(playerTime.sampleRate)
+//                        let totalDuration = Double(buffer.frameLength) / buffer.format.sampleRate
+//                        //                        let progress = min(1.0, max(0.0, currentTime / totalDuration))
+//                        let progress = currentTime / totalDuration
+//                        
+//                        self.playbackProgress = progress
+//                        
+//                        print("adada",progress)
+//                        
+//                        self.isPlaying = true
+//                        
+//                        // Post the progress notification only if not completed
+//                        
+//                        NotificationCenter.default.post(name: .audioPlayerProgressNotification, object: progress)
+//                        
+//                        
+//                        if progress > 1.0 {
+//                            
+//                            self.isPlaying = false
+//                            self.timer?.invalidate()
+//                            
+//                        }
+//                    }
+//                } else {
+//                    // Audio playback has finished, invalidate the timer
+//                    self.isPlaying = false
+//                    self.timer?.invalidate()
+//                }
+//            }
+//        } catch {
+//            self.isPlaying = false
+//            print("Error playing audio: \(error.localizedDescription)")
+//        }
+//    }
+//    
+//    func pauseAudio() {
+//        player.pause()
+//    }
+//    
+//    
+//}
 
 
 struct TextNotesView:View{

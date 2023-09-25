@@ -115,6 +115,7 @@ struct ChangePasswordView: View {
                 }.padding(.horizontal)
             }
         }.navigationTitle("Change Password")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 
                 ToolbarItem(placement:.confirmationAction) {

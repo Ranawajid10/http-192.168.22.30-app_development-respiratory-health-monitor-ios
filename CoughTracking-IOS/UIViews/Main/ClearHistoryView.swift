@@ -71,6 +71,7 @@ struct ClearHistoryView: View {
             }
         }.padding()
         .navigationTitle("Clear History")
+        .navigationBarTitleDisplayMode(.inline)
         .background(Color.screenBG)
         .alert(isPresented: $showAlert) {
              Alert(title: Text("Clear History?"), message: Text("Are you sure you want to clear history?"), primaryButton: .default(Text("No"), action: {

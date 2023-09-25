@@ -10,13 +10,13 @@ import AVFoundation
 
 struct VolunteerParticipationView: View {
     
+    @ObservedObject  var dashboardVM:DashboardVM
     @Environment(\.managedObjectContext) private var viewContext
     @FetchRequest(entity: VolunteerCough.entity(), sortDescriptors: []) var allCoughFetchResult: FetchedResults<VolunteerCough>
     
    
     @State private var toast: FancyToast? = nil
     
-    @ObservedObject var audioPlayerManager = AudioPlayerManager()
     @StateObject var vpVM = VolunteerParticipationVM()
     
     @State var isPlaying = false
@@ -130,12 +130,12 @@ struct VolunteerParticipationView: View {
                                             if isPlaying && playingPosition == index {
                                                 
                                                 // Pause the audio
-                                                audioPlayerManager.pauseAudio()
+                                                dashboardVM.pauseAudio()
                                                 
                                             } else {
                                                 
                                                 // Play the audio
-                                                playSample(cough: cough)
+                                                dashboardVM.playSample(floatArray: cough.coughSegments ?? [])
                                                 
                                             }
                                             
@@ -308,6 +308,7 @@ struct VolunteerParticipationView: View {
         }.toastView(toast: $toast)
         .background(Color.screenBG)
         .navigationTitle("Volunteer Participation")
+        .navigationBarTitleDisplayMode(.inline)
         .onChange(of: vpVM.isError){ newValue in
             
             if(newValue){
@@ -365,26 +366,7 @@ struct VolunteerParticipationView: View {
         
     }
     
-    func playSample(cough:VolunteerCough){
-        
-        NotificationCenter.default.post(name: .audioPlayerProgressNotification, object: 0)
-        
-        
-        do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .default)
-            try session.setActive(true)
-        } catch {
-            print("Error setting up AVAudioSession: \(error.localizedDescription)")
-        }
-        
-        if let audioBuffer = Functions.convertToAudioBuffer(floatArray: cough.coughSegments ?? [], sampleRate: 22050) {
-            
-            audioPlayerManager.playAudio(buffer: audioBuffer)
-            
-        }
-        
-    }
+   
     
 }
 

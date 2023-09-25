@@ -19,9 +19,9 @@ class DashboardVM:ObservableObject{
     @Published var isSyncing = false
     @Published var isDeleteAllCough = false
     
+    @Published var saveHours = false
     @Published var saveCough = false
     @Published  var isRecording = false
-    @Published private var isPlaying = false
     @Published private var audioRecorder: AVAudioRecorder!
     @Published private var audioFileURL: URL?
     
@@ -38,7 +38,18 @@ class DashboardVM:ObservableObject{
     
     @Published var totalSecondsRecordedToday: Double = 0.0
     
-    @Published var allCoughList:[VolunteerCough] = []
+    @Published var valunteerCoughList:[VolunteerCough] = []
+    @Published var coughTrackHourList:[CoughTrackingHours] = []
+    
+    
+    // Play Audio
+    private var engine = AVAudioEngine()
+    private var player = AVAudioPlayerNode()
+    
+    @Published var playbackProgress: Double = 0.0 // Publish playback progress
+    @Published var isPlaying: Bool = false
+    private var audioPlaytimer: Timer?
+    
     
     func startRecording(){
         
@@ -65,15 +76,15 @@ class DashboardVM:ObservableObject{
         
         
         let audioEngine = AVAudioEngine()
-         let audioInputNode = audioEngine.inputNode
-
-         // Add an equalization filter to reduce background noise
-         let eqFilter = AVAudioUnitEQ(numberOfBands: 1)
-         eqFilter.globalGain = -20 // Adjust this value to reduce noise
-
-         audioEngine.attach(eqFilter)
-         audioEngine.connect(audioInputNode, to: eqFilter, format: audioInputNode.outputFormat(forBus: 0))
-         audioEngine.connect(eqFilter, to: audioEngine.mainMixerNode, format: audioInputNode.outputFormat(forBus: 0))
+        let audioInputNode = audioEngine.inputNode
+        
+        // Add an equalization filter to reduce background noise
+        let eqFilter = AVAudioUnitEQ(numberOfBands: 1)
+        eqFilter.globalGain = -20 // Adjust this value to reduce noise
+        
+        audioEngine.attach(eqFilter)
+        audioEngine.connect(audioInputNode, to: eqFilter, format: audioInputNode.outputFormat(forBus: 0))
+        audioEngine.connect(eqFilter, to: audioEngine.mainMixerNode, format: audioInputNode.outputFormat(forBus: 0))
         
         do {
             
@@ -104,18 +115,6 @@ class DashboardVM:ObservableObject{
         if isRecording {
             
             audioRecorder.stop()
-           
-            
-            // Calculate the duration in hours
-            if let recordingStartTime = recordingStartTime {
-                let recordingEndTime = Date()
-                let durationInSeconds = recordingEndTime.timeIntervalSince(recordingStartTime)
-//                let durationInHours = durationInSeconds / 3600.0 // 3600 seconds in an hour
-                
-                // Increment the total hours recorded today
-                totalSecondsRecordedToday = durationInSeconds
-                
-            }
             
             
             if let audioFileURL = audioFileURL {
@@ -130,10 +129,37 @@ class DashboardVM:ObservableObject{
             }
             
             isRecording = false
-            
+            saveTrackedHours()
             
         }
     }
+    
+    func saveTrackedHours(){
+        
+        DispatchQueue.main.async { [self] in
+            
+            // Calculate the duration in hours
+            if let recordingStartTime = recordingStartTime {
+                let recordingEndTime = Date()
+                let durationInSeconds = recordingEndTime.timeIntervalSince(recordingStartTime)
+                //                let durationInHours = durationInSeconds / 3600.0 // 3600 seconds in an hour
+                
+                // Increment the total hours recorded today
+                totalSecondsRecordedToday = durationInSeconds
+                Constants.totalSecondsRecordedToday = totalSecondsRecordedToday
+                
+                
+            }
+            
+            
+            saveHours = true
+            
+        }
+        
+        
+        
+    }
+    
     
     func recordChunk() {
         guard isRecording else {
@@ -145,7 +171,7 @@ class DashboardVM:ObservableObject{
         do{
             
             let data = try? Data(contentsOf: audioFileURL!)
-            if let audioData = data {
+            if data != nil {
                 
                 // Here you can convert the audioData to a byte array as needed
                 
@@ -188,6 +214,7 @@ class DashboardVM:ObservableObject{
                     
                 }
                 
+//                saveTrackedHours()
                 // Restart recording after recording a chunk
                 audioRecorder?.record()
             }
@@ -208,7 +235,7 @@ class DashboardVM:ObservableObject{
             
         }else{
             
-            print("upload first five",allCoughList.count)
+            print("upload first five",valunteerCoughList.count)
             uploaFirstFiveCoughs()
             
         }
@@ -220,7 +247,7 @@ class DashboardVM:ObservableObject{
         
         isSyncing = true
         
-        ApiClient.shared.uploadSamples(allCoughList: allCoughList) { [self] response in
+        ApiClient.shared.uploadSamples(allCoughList: valunteerCoughList) { [self] response in
             
             isSyncing = false
             
@@ -245,7 +272,7 @@ class DashboardVM:ObservableObject{
         
         isSyncing = true
         
-        ApiClient.shared.uploadSamples(allCoughList: allCoughList) { [self] response in
+        ApiClient.shared.uploadSamples(allCoughList: valunteerCoughList) { [self] response in
             
             isSyncing = false
             
@@ -264,12 +291,100 @@ class DashboardVM:ObservableObject{
         
     }
     
+    func playSample(floatArray:[[Float]]){
+        
+        stopRecording()
+        
+        if(isRecording){
+           
+            stopRecording()
+            
+        }
+        
+        NotificationCenter.default.post(name: .audioPlayerProgressNotification, object: 0)
+        
+        
+        do {
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.playback, mode: .default)
+            try session.setActive(true)
+        } catch {
+            print("Error setting up AVAudioSession: \(error.localizedDescription)")
+        }
+        
+        if let audioBuffer = Functions.convertToAudioBuffer(floatArray: floatArray, sampleRate: 22050) {
+            
+           playAudio(buffer: audioBuffer)
+            
+        }
+        
+        
+        
+        
+    }
+    
+    func playAudio(buffer: AVAudioPCMBuffer) {
+        do {
+            engine.attach(player)
+            engine.connect(player, to: engine.mainMixerNode, format: buffer.format)
+            
+            player.scheduleBuffer(buffer, completionHandler: nil)
+            
+            try engine.start()
+            
+            // Start the audio player
+            player.play()
+            
+            // Create a timer to update playbackProgress in real-time
+            audioPlaytimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+                guard let self = self else { return }
+                if self.player.isPlaying {
+                    if let lastRenderTime = self.player.lastRenderTime,
+                       let playerTime = self.player.playerTime(forNodeTime: lastRenderTime) {
+                        // Calculate the current playback progress within the range [0, 1]
+                        let currentTime = Double(playerTime.sampleTime) / Double(playerTime.sampleRate)
+                        let totalDuration = Double(buffer.frameLength) / buffer.format.sampleRate
+                        //                        let progress = min(1.0, max(0.0, currentTime / totalDuration))
+                        let progress = currentTime / totalDuration
+                        
+                        self.playbackProgress = progress
+                        
+                        self.isPlaying = true
+                        
+                        // Post the progress notification only if not completed
+                        
+                        NotificationCenter.default.post(name: .audioPlayerProgressNotification, object: progress)
+                        
+                        
+                        if progress > 1.0 {
+                            
+                            self.isPlaying = false
+                            self.audioPlaytimer?.invalidate()
+                            
+                            startRecording()
+                            
+                        }
+                    }
+                } else {
+                    // Audio playback has finished, invalidate the timer
+                    self.isPlaying = false
+                    self.audioPlaytimer?.invalidate()
+                    
+                    startRecording()
+                }
+            }
+        } catch {
+            self.isPlaying = false
+            print("Error playing audio: \(error.localizedDescription)")
+        }
+    }
+    
+    func pauseAudio() {
+        player.pause()
+    }
     
     
     
-    
-    
-   
     
     // Usage example
     //    let inputData = [Float](repeating: 0.0, count: 100) // Replace with your actual input data

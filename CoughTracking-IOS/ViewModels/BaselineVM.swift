@@ -134,7 +134,7 @@ class BaselineVM:ObservableObject{
             }
         
         
-        requestMicrophonePermission() // Call the function when the timer starts
+        startRecording() // Call the function when the timer starts
     }
     
     
@@ -149,7 +149,7 @@ class BaselineVM:ObservableObject{
                 guard let self = self else { return }
                 if allowed {
                     DispatchQueue.main.async {
-                        self.startRecording()
+                        self.startTimer()
                     }
                 } else {
                     // Handle the case where the user denied microphone permission

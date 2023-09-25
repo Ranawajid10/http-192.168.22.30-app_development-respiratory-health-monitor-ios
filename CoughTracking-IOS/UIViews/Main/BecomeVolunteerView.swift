@@ -260,19 +260,19 @@ struct BecomeVolunteerView: View {
                 
             }.navigationDestination(isPresented: $becomeVolunteerVM.goNext) {
                 
-                VolunteerParticipationView()
+                VolunteerParticipationView(dashboardVM: dashboardVM)
                     .environment(\.managedObjectContext, viewContext)
-                    .onAppear{
-                        
-                        dashboardVM.stopRecording()
-                        
-                    }.onDisappear{
-                        
-                        if(!MyUserDefaults.getBool(forKey: Constants.isMicStopbyUser)){
-                            dashboardVM.startRecording()
-                        }
-                        
-                    }
+//                    .onAppear{
+//                        
+//                        dashboardVM.stopRecording()
+//                        
+//                    }.onDisappear{
+//                        
+//                        if(!MyUserDefaults.getBool(forKey: Constants.isMicStopbyUser)){
+//                            dashboardVM.startRecording()
+//                        }
+//                        
+//                    }
                 
             }.toolbar{
                 

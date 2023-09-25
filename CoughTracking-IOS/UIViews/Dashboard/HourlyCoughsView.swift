@@ -13,10 +13,14 @@ import Combine
 struct HourlyCoughsView: View {
     
     @ObservedObject var dashboardVM:DashboardVM
-    @Binding var totalCoughCount:Int
-    @Binding var totalTrackedHours:Double
-    @Binding var coughsPerHour:Int
     @Binding var allCoughList:[Cough]
+    @Binding var hourTrackedList:[CoughTrackingHours]
+    
+    
+    @State var totalCoughCount:Int = 0
+    @State var totalTrackedHours:Double = 0.0
+    @State var coughsPerHour:Int = 0
+    
     
     @State private var selectedDate = Date()
     @State private var currentHour = Calendar.current.component(.hour, from: Date())
@@ -56,7 +60,7 @@ struct HourlyCoughsView: View {
                         }
                     
                     
-                    HourSelectionView(currentHour: $currentHour)
+                    HourSelectionView(currentHour: $currentHour, selectedDate: $selectedDate)
                     
                     HourlyCoughGraph()
                     
@@ -112,18 +116,18 @@ struct HourlyCoughsView: View {
                                 
                             }else{
                                 
-                                VolunteerParticipationView()
+                                VolunteerParticipationView(dashboardVM: dashboardVM)
                                     .environment(\.managedObjectContext, viewContext)
-                                    .onAppear{
-                                        
-                                        dashboardVM.stopRecording()
-                                        
-                                    }.onDisappear{
-                                        
-                                        if(!MyUserDefaults.getBool(forKey: Constants.isMicStopbyUser)){
-                                            dashboardVM.startRecording()
-                                        }
-                                    }
+//                                    .onAppear{
+//                                        
+//                                        dashboardVM.stopRecording()
+//                                        
+//                                    }.onDisappear{
+//                                        
+//                                        if(!MyUserDefaults.getBool(forKey: Constants.isMicStopbyUser)){
+//                                            dashboardVM.startRecording()
+//                                        }
+//                                    }
                                 
                             }
                             
@@ -168,9 +172,66 @@ struct HourlyCoughsView: View {
         
     }
     
+    func calculateCurrentCoughHours(){
+        
+        totalTrackedHours = 0
+        coughsPerHour = 0
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        
+        let dateString = dateFormatter.string(from: selectedDate)
+        
+        var totalSeconds = 0.0
+        
+        for second in hourTrackedList {
+            
+            if(dateString == second.date){
+                
+                totalSeconds+=second.secondsTrack
+                
+            }
+            
+        }
+        
+        let hours =  totalSeconds/3600.0
+      
+        
+        if(hours<1){
+            
+            totalTrackedHours = 1.0
+            
+        }else{
+            
+            totalTrackedHours =  totalSeconds/3600.0
+            
+        }
+        
+//        totalTrackedHours = totalSeconds/3600.0
+//        print("coughsPerHour","0","--",totalCoughCount,"--",totalTrackedHours)
+        
+        
+//        if(Int(totalTrackedHours) > 1 && totalCoughCount > 1){
+
+            coughsPerHour = totalCoughCount / Int(totalTrackedHours)
+            print("coughsPerHour","1",coughsPerHour,"--",totalCoughCount)
+//
+//        }else{
+//
+//            coughsPerHour = 0
+//            print("coughsPerHour","2",coughsPerHour,"--",totalCoughCount)
+//
+//        }
+    }
+    
+    
     func getGraphData(){
         
         let (currentDateCoughs,times) = getCurrentCoughs(text: String(currentHour))
+       
+        
+        totalCoughCount = currentDateCoughs.count
         
         moderateTimeData.removeAll()
         severeTimeData.removeAll()
@@ -251,6 +312,8 @@ struct HourlyCoughsView: View {
         
         //        withAnimation {
         
+        calculateCurrentCoughHours()
+        
         changeGraph+=1
         
         //        }
@@ -312,10 +375,11 @@ struct HourlyCoughsView: View {
 struct HourSelectionView: View {
     
     @Binding var currentHour:Int
-    
+    @Binding var selectedDate: Date
     
     
     var body: some View {
+       
         HStack {
             
             
@@ -323,7 +387,7 @@ struct HourSelectionView: View {
                 
                 withAnimation {
                     
-                    previous()
+                    previousHour()
                     
                 }
                 
@@ -345,7 +409,7 @@ struct HourSelectionView: View {
                 
                 withAnimation {
                     
-                    next()
+                    nextHour()
                     
                 }
                 
@@ -360,18 +424,44 @@ struct HourSelectionView: View {
         .padding(.top,16)
     }
     
-    func next(){
+    func nextHour() {
         
         currentHour = (currentHour + 1) % 24
         
+        if(currentHour==0){
+            
+            nextDay()
+            
+        }
+        
     }
     
-    func previous(){
+    func previousHour() {
         
         currentHour = (currentHour - 1 + 24) % 24
         
+        if(currentHour==0){
+            
+            previousDay()
+            
+        }
     }
     
+    
+    func nextDay(){
+        
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: selectedDate) ?? Date()
+        if tomorrow <= Date() {
+            selectedDate = tomorrow
+        }
+        
+    }
+    
+    func previousDay(){
+        
+        selectedDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate) ?? Date()
+        
+    }
     
     func isToday(_ date: Date) -> Bool {
         return Calendar.current.isDate(date, inSameDayAs: Date())
@@ -403,9 +493,11 @@ struct DaySelectionView: View {
                 }
                 
             } label: {
+              
                 Image(systemName: "chevron.backward")
                     .foregroundColor(Color.black)
-            }
+           
+            }.frame(width: 20,height: 20)
             
             Spacer()
             
@@ -423,9 +515,11 @@ struct DaySelectionView: View {
                 }
                 
             } label: {
+                
                 Image(systemName: "chevron.forward")
                     .foregroundColor(Color.black)
-            }
+                
+            }.frame(width: 20,height: 20)
             .disabled(Calendar.current.isDateInTomorrow(selectedDate))
             
         }

@@ -51,7 +51,7 @@ struct BaselineView: View
                 
                 Button(action: {
                     
-                    baselineVM.startTimer()
+                    baselineVM.requestMicrophonePermission()
                     
                 }) {
                     Image("mic_recording")
@@ -151,6 +151,11 @@ struct BaselineView: View
             
             DashboardView()
                 .environment(\.managedObjectContext,viewContext)
+                .onAppear{
+                    
+                    saveCoughSample()
+                    
+                }
             
         })
         .toastView(toast: $toast)
@@ -186,30 +191,18 @@ struct BaselineView: View
         
         baseLine.uid = "1"
         baseLine.createdOn = String(DateUtills.getCurrentTimeInMilliseconds())
+        baseLine.coughSegments = baselineVM.segments
         
-        //        let floatArray: [Float] = [0.131, 0.3232, 1.4334, 0.4334, 0.3422, 0.434343]
-        //        let data = try? NSKeyedArchiver.archivedData(withRootObject: floatArray, requiringSecureCoding: false)
-        
-        //        for segment in baselineVM.segments{
-        //
-        //            let coughSegment = CoughEntity(context:viewContext)
-        //            coughSegment.value = segment
-        //
-        //            baseLine.addToCoughSegments(coughSegment)
-        //
-        //        }
-        
-        print("dsds",baselineVM.segments.count)
-        //        baseLine.setSegments(baselineVM.segments)
-        
-        //        print("ddadadd",baseLine.getSegments())
         
         do {
+            
             try viewContext.save()
-            print("saved")
+            
         } catch {
             // Handle the error
-            print("Error saving data: \(error.localizedDescription)")
+            baselineVM.errorMessage = "Error saving data: \(error.localizedDescription)"
+            baselineVM.isError = true
+           
         }
         
         

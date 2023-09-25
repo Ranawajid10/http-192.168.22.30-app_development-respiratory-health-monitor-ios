@@ -14,8 +14,8 @@ class LoginVM:ObservableObject{
     
     
     @Published var fcmToken: String  = "dL6uAbzuRMutCimTmYq4v9:APA91bGu0MnuzDhpzR-EXyjjlD0OzUuR6i_t8CO1J8Jpi-FQzevV77qCn1Xn9yufLcUaNJ4vsHVzLjANoazk-dq3HmRaJMtfPe_702HeTLXJxnuX-dO5WyOynGSeBVkLFJAmn7LsvRO"
-    @Published var email: String = ""
-//        @Published var email: String = "aftababbas7866@gmail.com"
+//    @Published var email: String = ""
+        @Published var email: String = "aftababbas7866@gmail.com"
     @Published var errorMessage: String = ""
     
     @Published var isLoading = false

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AllowSyncStatsView: View {
     
+    
     @Environment(\.managedObjectContext) private var viewContext
     @State var text:String
     @State var isAutoDonate = true
@@ -21,6 +22,8 @@ struct AllowSyncStatsView: View {
     @State var donateForResearch = Constants.syncOptionsList[1]
     
     @State private var toast: FancyToast? = nil
+    
+    @FetchRequest(entity: CoughBaseline.entity(), sortDescriptors: []) var coughBaselineFetchResult: FetchedResults<CoughBaseline>
     
     
     var body: some View {
@@ -158,10 +161,10 @@ struct AllowSyncStatsView: View {
                 
                 Button {
                     
-                   
+                    
                     
                     if(MyUserDefaults.getBool(forKey: Constants.isBaseLineSet)  ){
-                       
+                        
                         MyUserDefaults.saveBool(forKey: Constants.isAutoSync, value: isAutoSyncOn)
                         MyUserDefaults.saveBool(forKey: Constants.isAutoDonate, value: isAutoDonate)
                         MyUserDefaults.saveBool(forKey: Constants.isShareWithDoctor, value: isShareWithDoctor)
@@ -206,64 +209,79 @@ struct AllowSyncStatsView: View {
         }
         .toastView(toast: $toast)
         .navigationTitle("Data Sync")
-            .background(Color.screenBG)
-            .environment(\.managedObjectContext,viewContext)
-            .navigationDestination(isPresented: $goNext) {
+        .navigationBarTitleDisplayMode(.inline)
+        .background(Color.screenBG)
+        .environment(\.managedObjectContext,viewContext)
+        .navigationDestination(isPresented: $goNext) {
+            
+            if(coughBaselineFetchResult.count>0){
+                
+                DashboardView()
+                    .environment(\.managedObjectContext,viewContext)
+                    .onAppear{
+                        
+                        MyUserDefaults.saveBool(forKey: Constants.isBaseLineSet, value: true)
+                        
+                    }
+                
+            }else{
                 
                 BaselineView()
                     .environment(\.managedObjectContext,viewContext)
                 
-            }.onChange(of: isAutoSyncOn, perform: { newValue in
-                if(!newValue){
-                    
-                    withAnimation {
-                        isShareWithDoctor = false
-                        isDonateForResearch = false
-                    }
-                    
+            }
+            
+        }.onChange(of: isAutoSyncOn, perform: { newValue in
+            if(!newValue){
+                
+                withAnimation {
+                    isShareWithDoctor = false
+                    isDonateForResearch = false
                 }
-            })
-            .onAppear{
+                
+            }
+        })
+        .onAppear{
+            
+            
+            if(MyUserDefaults.getBool(forKey: Constants.isLoggedIn) && MyUserDefaults.getBool(forKey: Constants.isBaseLineSet) ){
                 
                 
-                if(MyUserDefaults.getBool(forKey: Constants.isLoggedIn) && MyUserDefaults.getBool(forKey: Constants.isBaseLineSet) ){
+                isAutoDonate = MyUserDefaults.getBool(forKey: Constants.isAutoDonate)
+                isAutoSyncOn = MyUserDefaults.getBool(forKey: Constants.isAutoSync)
+                isShareWithDoctor = MyUserDefaults.getBool(forKey: Constants.isShareWithDoctor)
+                isDonateForResearch = MyUserDefaults.getBool(forKey: Constants.isDonateForResearch)
+                
+                
+                if let index = Constants.syncOptionsList.firstIndex(of: MyUserDefaults.getString(forKey: Constants.shareWithDoctor)) {
                     
                     
-                    isAutoDonate = MyUserDefaults.getBool(forKey: Constants.isAutoDonate)
-                    isAutoSyncOn = MyUserDefaults.getBool(forKey: Constants.isAutoSync)
-                    isShareWithDoctor = MyUserDefaults.getBool(forKey: Constants.isShareWithDoctor)
-                    isDonateForResearch = MyUserDefaults.getBool(forKey: Constants.isDonateForResearch)
-                    
-                    
-                    if let index = Constants.syncOptionsList.firstIndex(of: MyUserDefaults.getString(forKey: Constants.shareWithDoctor)) {
-                       
-                        
-                        shareWithDoctor = Constants.syncOptionsList[index]
-                        
-                    }
-                    
-                    
-                    if let index1 = Constants.syncOptionsList.firstIndex(of: MyUserDefaults.getString(forKey: Constants.donateForResearch)) {
-                       
-                        
-                        donateForResearch = Constants.syncOptionsList[index1]
-                        
-                    }
-                    
-                    
+                    shareWithDoctor = Constants.syncOptionsList[index]
                     
                 }
                 
                 
-            }.onChange(of: saved, perform: { newValue in
-                if(newValue){
+                if let index1 = Constants.syncOptionsList.firstIndex(of: MyUserDefaults.getString(forKey: Constants.donateForResearch)) {
                     
-                    toast = FancyToast(type: .success, title: "Success", message: "Data sync saved successfully")
-                    saved = false
+                    
+                    donateForResearch = Constants.syncOptionsList[index1]
                     
                 }
                 
-            })
+                
+                
+            }
+            
+            
+        }.onChange(of: saved, perform: { newValue in
+            if(newValue){
+                
+                toast = FancyToast(type: .success, title: "Success", message: "Data sync saved successfully")
+                saved = false
+                
+            }
+            
+        })
     }
 }
 

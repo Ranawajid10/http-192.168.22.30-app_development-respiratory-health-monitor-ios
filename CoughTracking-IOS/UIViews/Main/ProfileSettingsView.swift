@@ -177,6 +177,7 @@ struct ProfileSettingsView: View {
             }
             
         }.navigationTitle("Profile Settings")
+            .navigationBarTitleDisplayMode(.inline)
             .customAlert(isPresented: $showNotification) {
                 
                 CustomAlertView(
@@ -210,7 +211,7 @@ struct ProfileSettingsView: View {
                 
             }.navigationDestination(isPresented: $goGetStarted) {
                 
-                GetStartedView()
+                SplashView()
                     .environment(\.managedObjectContext,viewContext)
                 
             }.onAppear{
@@ -225,13 +226,18 @@ struct ProfileSettingsView: View {
     func doSignOut(){
         
         dashboardVM.stopRecording()
+        dashboardVM.stopRecording()
+        
+        if(dashboardVM.isRecording){
+            
+            dashboardVM.stopRecording()
+            
+        }
         
         isLoading = true
         goGetStarted = false
         
         MyUserDefaults.saveBool(forKey: Constants.isLoggedIn, value: false)
-        MyUserDefaults.saveBool(forKey: Constants.isBaseLineSet, value: false)
-        MyUserDefaults.saveFloat(forKey: Constants.baseLineLoudness, value: 0.0)
         
         MyUserDefaults.saveBool(forKey: Constants.isAllowSync, value: false)
         MyUserDefaults.saveBool(forKey: Constants.isAutoSync, value: false)
@@ -240,12 +246,13 @@ struct ProfileSettingsView: View {
         MyUserDefaults.saveBool(forKey: Constants.isShareWithDoctor, value: false)
         MyUserDefaults.saveString(forKey: Constants.shareWithDoctor, value:  Constants.syncOptionsList[1])
         MyUserDefaults.saveString(forKey: Constants.donateForResearch, value:  Constants.syncOptionsList[1])
+        MyUserDefaults.removeUserData()
         
         
         
         
         deleteCoughData()
-        deleteBaseLinehData()
+//        deleteBaseLinehData()
         deleteVolunteer()
         deleteTrackedHour()
         

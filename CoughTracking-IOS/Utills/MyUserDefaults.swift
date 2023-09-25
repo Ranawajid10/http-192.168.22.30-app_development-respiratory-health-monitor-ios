@@ -83,8 +83,8 @@ class MyUserDefaults{
     
     // MARK: - Remove User Data
     
-    static func removeUserData(forKey key: String) {
-        UserDefaults.standard.removeObject(forKey: key)
+    static func removeUserData() {
+        UserDefaults.standard.removeObject(forKey: Constants.userData)
     }
     
     

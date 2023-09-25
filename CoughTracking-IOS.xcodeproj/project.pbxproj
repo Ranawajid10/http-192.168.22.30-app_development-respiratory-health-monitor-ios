@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C06522C317DF6DF9DC6F76D3 /* Pods_CoughTracking_IOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D19EEABF8D1AA348843A098 /* Pods_CoughTracking_IOS.framework */; };
+		F334643A2AC1B30800FE2614 /* DateFormats.swift in Sources */ = {isa = PBXBuildFile; fileRef = F33464392AC1B30800FE2614 /* DateFormats.swift */; };
 		F35ED31E2ABABCF200E91289 /* CoughTracking_IOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F35ED31D2ABABCF200E91289 /* CoughTracking_IOSApp.swift */; };
 		F35ED3222ABABCF400E91289 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F35ED3212ABABCF400E91289 /* Assets.xcassets */; };
 		F35ED3252ABABCF400E91289 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F35ED3242ABABCF400E91289 /* Preview Assets.xcassets */; };
@@ -93,6 +94,7 @@
 		778CD59F2ABAE49300BAC392 /* Pods.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Pods.xcodeproj; path = Pods/Pods.xcodeproj; sourceTree = "<group>"; };
 		9AA51B4555C52FBD690B3A13 /* Pods-CoughTracking-IOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CoughTracking-IOS.debug.xcconfig"; path = "Target Support Files/Pods-CoughTracking-IOS/Pods-CoughTracking-IOS.debug.xcconfig"; sourceTree = "<group>"; };
 		B852408408A03C921EA50DBD /* Pods-CoughTracking-IOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CoughTracking-IOS.release.xcconfig"; path = "Target Support Files/Pods-CoughTracking-IOS/Pods-CoughTracking-IOS.release.xcconfig"; sourceTree = "<group>"; };
+		F33464392AC1B30800FE2614 /* DateFormats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormats.swift; sourceTree = "<group>"; };
 		F35ED31A2ABABCF200E91289 /* CoughTracking-IOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CoughTracking-IOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F35ED31D2ABABCF200E91289 /* CoughTracking_IOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoughTracking_IOSApp.swift; sourceTree = "<group>"; };
 		F35ED3212ABABCF400E91289 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -257,6 +259,7 @@
 				F35ED3442ABAC05700E91289 /* DateUtills.swift */,
 				F35ED3462ABAC06A00E91289 /* CustomViews.swift */,
 				F35ED3482ABAC08100E91289 /* Constants.swift */,
+				F33464392AC1B30800FE2614 /* DateFormats.swift */,
 			);
 			path = Utills;
 			sourceTree = "<group>";
@@ -530,6 +533,7 @@
 				F35ED3672ABAC34700E91289 /* MyProfileView.swift in Sources */,
 				F35ED31E2ABABCF200E91289 /* CoughTracking_IOSApp.swift in Sources */,
 				F35ED3812ABAC4CD00E91289 /* LoginResult.swift in Sources */,
+				F334643A2AC1B30800FE2614 /* DateFormats.swift in Sources */,
 				F35ED3BB2ABACADA00E91289 /* CoughMoniterCoreModel.xcdatamodeld in Sources */,
 				F35ED37B2ABAC45400E91289 /* HourlyCoughsView.swift in Sources */,
 				F35ED33D2ABABFE300E91289 /* Modifiers.swift in Sources */,

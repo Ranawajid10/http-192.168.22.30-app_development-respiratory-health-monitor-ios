@@ -41,6 +41,8 @@ extension Date {
 
 extension Notification.Name {
     static let audioPlayerProgressNotification = Notification.Name("AudioPlayerProgressNotification")
+    static let appTerminateNotification = Notification.Name("appTerminateNotification")
+    static let updateGraphNotification = Notification.Name("updateGraphNotification")
 }
 
 

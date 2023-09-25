@@ -62,6 +62,7 @@ struct UserReportView: View {
             }.padding()
             
         }.navigationTitle("User Report")
+            .navigationBarTitleDisplayMode(.inline)
     }
 }
 

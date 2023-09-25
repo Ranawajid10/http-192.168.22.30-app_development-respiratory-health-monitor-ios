@@ -45,6 +45,7 @@ class Constants{
     static let donateForResearch : String =  "donateForResearch"
     static let isAutoDonate : String =  "isAutoDonate"
     static let isAllowSync : String =  "isAllowSync"
+    static var totalSecondsRecordedToday : Double = 0.0
     
     
 }

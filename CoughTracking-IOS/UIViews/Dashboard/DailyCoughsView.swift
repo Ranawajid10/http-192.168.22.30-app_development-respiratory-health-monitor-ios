@@ -11,13 +11,16 @@ import AAInfographics
 struct DailyCoughsView: View {
     
     @ObservedObject var dashboardVM:DashboardVM
-    @Binding var totalCoughCount:Int
-    @Binding var totalTrackedHours:Double
-    @Binding var coughsPerHour:Int
     @Binding var allCoughList:[Cough]
+    @Binding var hourTrackedList:[CoughTrackingHours]
     
     var array = ["00:00", "02:00", "04:00", "06:00", "08:00", "10:00",
                  "12:00", "14:00", "16:00", "18:00", "20:00", "23:00"]
+    
+    @State var totalCoughCount:Int = 0
+    @State var totalTrackedHours:Double = 0.0
+    @State var coughsPerHour:Int = 0
+    
     
     @State private var selectedDate = Date()
     
@@ -100,19 +103,19 @@ struct DailyCoughsView: View {
                                 
                             }else{
                                 
-                                VolunteerParticipationView()
+                                VolunteerParticipationView(dashboardVM: dashboardVM)
                                     .environment(\.managedObjectContext, viewContext)
-                                    .onAppear{
-                                        
-                                        dashboardVM.stopRecording()
-                                        
-                                    }.onDisappear{
-                                        
-                                        if(!MyUserDefaults.getBool(forKey: Constants.isMicStopbyUser)){
-                                            dashboardVM.startRecording()
-                                        }
-                                        
-                                    }
+//                                    .onAppear{
+//                                        
+//                                        dashboardVM.stopRecording()
+//                                        
+//                                    }.onDisappear{
+//                                        
+//                                        if(!MyUserDefaults.getBool(forKey: Constants.isMicStopbyUser)){
+//                                            dashboardVM.startRecording()
+//                                        }
+//                                        
+//                                    }
                                 
                             }
                             
@@ -153,9 +156,65 @@ struct DailyCoughsView: View {
         }
     }
     
+    func calculateCurrentCoughHours(){
+        
+        totalTrackedHours = 0
+        coughsPerHour = 0
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        
+        let dateString = dateFormatter.string(from: selectedDate)
+        
+        var totalSeconds = 0.0
+        
+        for second in hourTrackedList {
+            
+            if(dateString == second.date){
+                
+                totalSeconds+=second.secondsTrack
+                
+            }
+            
+        }
+        
+        
+        let hours =  totalSeconds/3600.0
+      
+        
+        if(hours<1){
+            
+            totalTrackedHours = 1
+            
+        }else{
+            
+            totalTrackedHours =  totalSeconds/3600.0
+            
+        }
+        
+        
+//        totalTrackedHours = totalSeconds/3600.0
+        
+//        if(totalTrackedHours > 1 && coughsPerHour > 1){
+
+//            print("coughsPerHour","1")
+            coughsPerHour = totalCoughCount / Int(totalTrackedHours)
+
+//        }else{
+//
+//            print("coughsPerHour","2")
+//            coughsPerHour = 0
+//
+//        }
+    }
+    
     func getGraphData(){
         
         let (currentDateCoughs,times) = getCurrentDayCoughs()
+        calculateCurrentCoughHours()
+        
+        totalCoughCount = currentDateCoughs.count
         
         moderateTimeData.removeAll()
         severeTimeData.removeAll()

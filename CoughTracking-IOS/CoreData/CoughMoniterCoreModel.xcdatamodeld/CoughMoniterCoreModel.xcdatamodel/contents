@@ -8,12 +8,9 @@
         <attribute name="time" optional="YES" attributeType="String"/>
     </entity>
     <entity name="CoughBaseline" representedClassName="CoughBaseline" syncable="YES" codeGenerationType="class">
+        <attribute name="coughSegments" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[[Float]]"/>
         <attribute name="createdOn" optional="YES" attributeType="String"/>
         <attribute name="uid" optional="YES" attributeType="String"/>
-        <relationship name="coughSegments" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CoughEntity"/>
-    </entity>
-    <entity name="CoughEntity" representedClassName="CoughEntity" syncable="YES" codeGenerationType="class">
-        <attribute name="value" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES"/>
     </entity>
     <entity name="CoughTrackingHours" representedClassName="CoughTrackingHours" syncable="YES" codeGenerationType="class">
         <attribute name="date" optional="YES" attributeType="String"/>

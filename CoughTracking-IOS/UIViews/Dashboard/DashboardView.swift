@@ -18,6 +18,7 @@ struct DashboardView: View {
     @State var allCoughList:[Cough] = []
     
     
+    
     @Environment(\.managedObjectContext) private var viewContext
     
     @StateObject var dashboardVM = DashboardVM()
@@ -69,19 +70,19 @@ struct DashboardView: View {
                 Group{
                     if selectedDayIndex == 0 {
                         
-                        HourlyCoughsView(dashboardVM: dashboardVM,totalCoughCount: $totalCoughCount, totalTrackedHours: $totalTrackedHours, coughsPerHour: $coughsPerHour, allCoughList: $allCoughList)
+                        HourlyCoughsView(dashboardVM: dashboardVM, allCoughList: $allCoughList,hourTrackedList: $dashboardVM.coughTrackHourList)
                             .environment(\.managedObjectContext, viewContext)
                             .id(1)
                         
                     } else if selectedDayIndex == 1 {
                         
-                        DailyCoughsView(dashboardVM: dashboardVM,totalCoughCount: $totalCoughCount, totalTrackedHours: $totalTrackedHours, coughsPerHour: $coughsPerHour, allCoughList: $allCoughList)
+                        DailyCoughsView(dashboardVM: dashboardVM,allCoughList: $allCoughList,hourTrackedList: $dashboardVM.coughTrackHourList)
                             .environment(\.managedObjectContext, viewContext)
                             .id(2)
                         
                     } else {
                         
-                        WeeklyCoughsView(dashboardVM: dashboardVM,totalCoughCount: $totalCoughCount, totalTrackedHours: $totalTrackedHours, coughsPerHour: $coughsPerHour, allCoughList: $allCoughList)
+                        WeeklyCoughsView(dashboardVM: dashboardVM, allCoughList: $allCoughList,hourTrackedList: $dashboardVM.coughTrackHourList)
                             .environment(\.managedObjectContext, viewContext)
                             .id(3)
                     }
@@ -140,13 +141,18 @@ struct DashboardView: View {
                 
             }.onAppear{
                 
-                dashboardVM.allCoughList = Array(allValunteerCoughFetchResult)
+                allCoughList.removeAll()
+                
+                allCoughList =  Array(coughFetchResult)
+                
+                dashboardVM.valunteerCoughList = Array(allValunteerCoughFetchResult)
+                dashboardVM.coughTrackHourList = Array(coughTrackingHoursFetchResult)
                 
                 calculateTotalCoughHours()
-                                if(!MyUserDefaults.getBool(forKey: Constants.isMicStopbyUser)){
-                                    dashboardVM.startRecording()
-                                }
-                
+               
+                if(!MyUserDefaults.getBool(forKey: Constants.isMicStopbyUser)){
+                    dashboardVM.startRecording()
+                }
                 
                 
             }.onReceive(dashboardVM.$saveCough, perform:  { i in
@@ -158,22 +164,14 @@ struct DashboardView: View {
                 }
                 
                 
-            }).onReceive(dashboardVM.$isRecording, perform:  { i in
+            }).onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextObjectsDidChange)) { notification in
                 
-                if(!i){
-                    
-                    saveTrackedHours()
-                    
-                }
+               
+                dashboardVM.valunteerCoughList.removeAll()
+                dashboardVM.coughTrackHourList.removeAll()
                 
-                
-            })
-            .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextObjectsDidChange)) { _ in
-                
-                
-                dashboardVM.allCoughList.removeAll()
-                
-                dashboardVM.allCoughList =  Array(allValunteerCoughFetchResult)
+                dashboardVM.coughTrackHourList = Array(coughTrackingHoursFetchResult)
+                dashboardVM.valunteerCoughList =  Array(allValunteerCoughFetchResult)
                 
                 allCoughList =  Array(coughFetchResult)
                 totalCoughCount = allCoughList.count
@@ -210,6 +208,15 @@ struct DashboardView: View {
                 }
                 
                 
+            }).onReceive(dashboardVM.$saveHours, perform:  { i in
+                
+                if(i){
+                    
+                    saveTrackedHours()
+                    
+                }
+                
+                
             })
     }
     
@@ -221,7 +228,18 @@ struct DashboardView: View {
         
         let totalSeconds = coughTrackingHoursFetchResult.reduce(0) { $0 + $1.secondsTrack }
         
-        totalTrackedHours =  totalSeconds/3600.0
+        let hours =  totalSeconds/3600.0
+      
+        
+        if(hours<1){
+            
+            totalTrackedHours = 1
+            
+        }else{
+            
+            totalTrackedHours =  totalSeconds/3600.0
+            
+        }
         
         print("fff",totalTrackedHours,"------",coughTrackingHoursFetchResult.count)
         
@@ -336,7 +354,7 @@ struct DashboardView: View {
             
             try viewContext.save()
             print("savedTrackedHours")
-            
+            MyUserDefaults.saveString(forKey: "savedTrackedHours", value: "savedTrackedHours on " + DateUtills.getCurrentTimeInMilliseconds())
             
             
         } catch {
@@ -505,11 +523,11 @@ struct HomeTopBar: View {
             
             NavigationLink {
                 
-                NotesView()
+                NotesView(dashboardVM: dashboardVM)
                     .environment(\.managedObjectContext, viewContext)
-                    .onAppear{
-                        dashboardVM.stopRecording()
-                    }
+//                    .onAppear{
+//                        dashboardVM.stopRecording()
+//                    }
                 
             } label: {
                 
@@ -756,28 +774,28 @@ struct ScheduleMonitoringBottomSheet:View{
                 
             }
             
-            
-            Spacer()
-            
-            
-            Toggle(isOn: $isDayOn) {
-                
-                Text("Day")
-                    .foregroundColor(.black)
-                    .modifier(LatoFontModifier(fontWeight: .bold, fontSize: 18))
-                
-            }.padding(.horizontal)
-                .backgroundStyle(Color.appColorBlue)
-            
-            
-            
-            Toggle(isOn: $isNightOn) {
-                
-                Text("Night")
-                    .foregroundColor(.black)
-                    .modifier(LatoFontModifier(fontWeight: .bold, fontSize: 18))
-                
-            }.padding(.horizontal)
+//
+//            Spacer()
+//
+//
+//            Toggle(isOn: $isDayOn) {
+//
+//                Text("Day")
+//                    .foregroundColor(.black)
+//                    .modifier(LatoFontModifier(fontWeight: .bold, fontSize: 18))
+//
+//            }.padding(.horizontal)
+//                .backgroundStyle(Color.appColorBlue)
+//
+//
+//
+//            Toggle(isOn: $isNightOn) {
+//
+//                Text("Night")
+//                    .foregroundColor(.black)
+//                    .modifier(LatoFontModifier(fontWeight: .bold, fontSize: 18))
+//
+//            }.padding(.horizontal)
             
             
             Spacer()

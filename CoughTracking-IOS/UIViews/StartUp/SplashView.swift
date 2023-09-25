@@ -17,10 +17,7 @@ struct SplashView: View
     @State private var goToNextScreen = false
     @State private var isActive = false
     
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \CoughBaseline.uid, ascending: true)],
-        animation: .default)
-    private var tasks: FetchedResults<CoughBaseline>
+    @FetchRequest(entity: CoughBaseline.entity(), sortDescriptors: []) var coughBaselineFetchResult: FetchedResults<CoughBaseline>
     
    
     var body: some View
@@ -29,8 +26,33 @@ struct SplashView: View
             
             if self.isActive{
                 
-                GetStartedView()
-                    .environment(\.managedObjectContext,viewContext)
+                if(MyUserDefaults.getBool(forKey: Constants.isLoggedIn)){
+                    
+                    if(MyUserDefaults.getBool(forKey: Constants.isBaseLineSet)){
+                        
+                        DashboardView()
+                            .environment(\.managedObjectContext, viewContext)
+                        
+                    }else if(!MyUserDefaults.getBool(forKey: Constants.isAllowSync)){
+                        
+                        AllowSyncStatsView(text: "Continue" )
+                            .environment(\.managedObjectContext, viewContext)
+                   
+                    }else if(coughBaselineFetchResult.count == 0){
+                        
+                        BaselineView()
+                            .environment(\.managedObjectContext, viewContext)
+                        
+                    }
+                    
+                    
+                }else{
+                    
+                    GetStartedView()
+                        .environment(\.managedObjectContext,viewContext)
+                    
+                }
+               
                     
             }else{
                 
@@ -67,6 +89,10 @@ struct SplashView: View
         .onAppear() {
             
             animated()
+            
+            print(MyUserDefaults.getBool(forKey: Constants.isLoggedIn), Constants.isLoggedIn)
+            print(MyUserDefaults.getBool(forKey: Constants.isBaseLineSet), Constants.isBaseLineSet)
+            print(coughBaselineFetchResult.count,"count")
         
         }.environment(\.managedObjectContext,viewContext)
         .background(Color.white.edgesIgnoringSafeArea(.all))
