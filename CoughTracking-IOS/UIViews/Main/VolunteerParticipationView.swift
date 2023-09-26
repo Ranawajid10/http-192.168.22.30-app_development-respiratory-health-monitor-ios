@@ -10,8 +10,9 @@ import AVFoundation
 
 struct VolunteerParticipationView: View {
     
-    @ObservedObject  var dashboardVM:DashboardVM
     @Environment(\.managedObjectContext) private var viewContext
+    
+    @ObservedObject  var dashboardVM:DashboardVM
     @FetchRequest(entity: VolunteerCough.entity(), sortDescriptors: []) var allCoughFetchResult: FetchedResults<VolunteerCough>
     
    
@@ -309,7 +310,7 @@ struct VolunteerParticipationView: View {
         .background(Color.screenBG)
         .navigationTitle("Volunteer Participation")
         .navigationBarTitleDisplayMode(.inline)
-        .onChange(of: vpVM.isError){ newValue in
+        .onChange(of: vpVM.isError){ oldValue, newValue in
             
             if(newValue){
                 

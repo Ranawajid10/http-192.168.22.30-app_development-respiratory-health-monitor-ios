@@ -2,7 +2,7 @@
 //  VolunteerCough+CoreDataProperties.swift
 //  
 //
-//  Created by Ali Rizwan on 20/09/2023.
+//  Created by Ali Rizwan on 27/09/2023.
 //
 //
 
@@ -18,8 +18,8 @@ extension VolunteerCough {
 
     @NSManaged public var coughPower: String?
     @NSManaged public var coughSegments: [[Float]]?
-    @NSManaged public var id: String?
     @NSManaged public var date: String?
+    @NSManaged public var id: String?
     @NSManaged public var time: String?
 
 }

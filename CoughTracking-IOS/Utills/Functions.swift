@@ -8,6 +8,8 @@
 import Foundation
 import CoreData
 import AVFoundation
+import UIKit
+import SwiftUI
 
 
 class Functions{
@@ -100,6 +102,24 @@ class Functions{
         }
     }
     
+    
+    static func changeBackIconTextColor(color:ColorResource){
+        
+        UINavigationBar.appearance().standardAppearance = {
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithTransparentBackground()
+            appearance.titleTextAttributes = [.foregroundColor: UIColor.black] // Change title color
+            appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.black] // Change large title color
+            appearance.backgroundColor = UIColor(resource: color)
+            
+            // Customize back button text color
+            appearance.buttonAppearance.normal.titleTextAttributes = [.foregroundColor:UIColor(resource: color)]
+            
+            return appearance
+        }()
+        
+        
+    }
     
 }
 

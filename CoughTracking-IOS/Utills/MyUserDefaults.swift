@@ -14,6 +14,7 @@ class MyUserDefaults{
     
     static func saveString(forKey key: String, value: String ) {
         UserDefaults.standard.set(value, forKey: key)
+        UserDefaults.standard.synchronize()
     }
     
     static func getString(forKey key: String) -> String {
@@ -24,6 +25,7 @@ class MyUserDefaults{
     
     static func saveInt( forKey key: String,value: Int) {
         UserDefaults.standard.set(value, forKey: key)
+        UserDefaults.standard.synchronize()
     }
     
     static func getInt(forKey key: String) -> Int {
@@ -34,6 +36,7 @@ class MyUserDefaults{
     
     static func saveBool(forKey key: String,value: Bool) {
         UserDefaults.standard.set(value, forKey: key)
+        UserDefaults.standard.synchronize()
     }
     
     static func getBool(forKey key: String) -> Bool {
@@ -44,6 +47,7 @@ class MyUserDefaults{
     
     static func removeValue(forKey key: String) {
         UserDefaults.standard.removeObject(forKey: key)
+        UserDefaults.standard.synchronize()
     }
     
     
@@ -51,6 +55,7 @@ class MyUserDefaults{
     
     static func saveFloat( forKey key: String,value: Float) {
         UserDefaults.standard.set(value, forKey: key)
+        UserDefaults.standard.synchronize()
     }
     
     static func getFloat(forKey key: String) -> Float {
@@ -64,6 +69,7 @@ class MyUserDefaults{
             let encoder = JSONEncoder()
             let encodedData = try encoder.encode(value)
             UserDefaults.standard.set(encodedData, forKey: Constants.userData)
+            UserDefaults.standard.synchronize()
         } catch {
             print("Error saving Codable object: \(error.localizedDescription)")
         }
@@ -85,6 +91,7 @@ class MyUserDefaults{
     
     static func removeUserData() {
         UserDefaults.standard.removeObject(forKey: Constants.userData)
+        UserDefaults.standard.synchronize()
     }
     
     
@@ -96,4 +103,18 @@ class MyUserDefaults{
         return userData.token ?? ""
     }
     
+    static func saveDate(forKey key: String, value: Date) {
+           UserDefaults.standard.set(value, forKey: key)
+           UserDefaults.standard.synchronize()
+       }
+
+       static func getDate(forKey key: String) -> Date? {
+           return UserDefaults.standard.object(forKey: key) as? Date
+       }
+    
+    
+    static func removeDate(key:String) {
+        UserDefaults.standard.removeObject(forKey: key)
+        UserDefaults.standard.synchronize()
+    }
 }

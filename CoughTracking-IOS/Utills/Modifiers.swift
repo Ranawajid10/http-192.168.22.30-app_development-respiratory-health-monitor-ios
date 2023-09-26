@@ -31,7 +31,7 @@ struct TextFieldMaxCharacterLimitModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .onChange(of: text) { newValue in
+            .onChange(of: text) { oldValue, newValue in
                 if newValue.count > limit {
                     text = String(newValue.prefix(limit))
                 }

@@ -1,0 +1,28 @@
+PODS:
+  - SwiftAudioPlayer (7.6.0)
+  - TensorFlowLiteC (2.13.0):
+    - TensorFlowLiteC/Core (= 2.13.0)
+  - TensorFlowLiteC/Core (2.13.0)
+  - TensorFlowLiteSwift (2.13.0):
+    - TensorFlowLiteSwift/Core (= 2.13.0)
+  - TensorFlowLiteSwift/Core (2.13.0):
+    - TensorFlowLiteC (= 2.13.0)
+
+DEPENDENCIES:
+  - SwiftAudioPlayer
+  - TensorFlowLiteSwift
+
+SPEC REPOS:
+  trunk:
+    - SwiftAudioPlayer
+    - TensorFlowLiteC
+    - TensorFlowLiteSwift
+
+SPEC CHECKSUMS:
+  SwiftAudioPlayer: a546709faf47f3ab0cb59e41ba4432e6bb61db0a
+  TensorFlowLiteC: ac3334fa9dbc90e4744b4497312a393fd02b5408
+  TensorFlowLiteSwift: 1d8320fbf292054eb50ef0b347a4b17a92b49731
+
+PODFILE CHECKSUM: 4565d028562b936cc94a3eaa133571550782f547
+
+COCOAPODS: 1.12.1

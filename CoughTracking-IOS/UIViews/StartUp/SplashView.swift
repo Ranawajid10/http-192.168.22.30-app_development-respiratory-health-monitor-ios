@@ -19,7 +19,12 @@ struct SplashView: View
     
     @FetchRequest(entity: CoughBaseline.entity(), sortDescriptors: []) var coughBaselineFetchResult: FetchedResults<CoughBaseline>
     
-   
+    @State var offset = 0.0
+    
+    @State private var allValunteerCoughList: [VolunteerCough] = []
+    @State private var uploadTrackingHoursList: [HoursUpload] = []
+
+    
     var body: some View
     {
         VStack(spacing: 0) {
@@ -35,7 +40,7 @@ struct SplashView: View
                         
                     }else if(!MyUserDefaults.getBool(forKey: Constants.isAllowSync)){
                         
-                        AllowSyncStatsView(text: "Continue" )
+                        AllowSyncStatsView(text: "Continue",allValunteerCoughList: $allValunteerCoughList ,uploadTrackingHoursList: $uploadTrackingHoursList)
                             .environment(\.managedObjectContext, viewContext)
                    
                     }else if(coughBaselineFetchResult.count == 0){
@@ -56,43 +61,62 @@ struct SplashView: View
                     
             }else{
                 
-                Image("background-signs-splash")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 350, height: 400)
-                    .alignmentGuide(.top) { dimension in
-                        dimension[.top]
+                ZStack{
+                    VStack{
+                        Image("background-signs-splash")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 350, height: 400)
+                            .alignmentGuide(.top) { dimension in
+                                dimension[.top]
+                            }
+                            .scaleEffect(animate ? 1 : 0.3)
+                            .opacity(animate ? 1 : 0.3)
+                        
+                        Image("coughapp-logo")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 300, height: 120)
+                            .scaleEffect(animate ? 1 : 0.3)
+                        
+                        Image("background-signs-splash")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 350, height: 400)
+                            .alignmentGuide(.bottom) { dimension in
+                                dimension[.bottom]
+                            }
+                            .scaleEffect(animate ? 1 : 0.3)
+                            .opacity(animate ? 1 : 0.3)
+                        
                     }
-                    .scaleEffect(animate ? 1 : 0.3)
-                    .opacity(animate ? 1 : 0.3)
-                
-                Image("coughapp-logo")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 300, height: 120)
-                    .scaleEffect(animate ? 1 : 0.3)
-                
-                Image("background-signs-splash")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 350, height: 400)
-                    .alignmentGuide(.bottom) { dimension in
-                        dimension[.bottom]
-                    }
-                    .scaleEffect(animate ? 1 : 0.3)
-                    .opacity(animate ? 1 : 0.3)
-                
+                    
+                   
+                    VStack{
+                        
+                        Spacer()
+                        
+                        Text("POWERED BY")
+                            .tracking(2)
+                            .foregroundColor(Color.appColorBlue)
+                            .font(.system(size: 9))
+                            .fontWeight(.heavy)
+                        
+                        Image("ai4lyf")
+                            .resizable()
+                            .frame(width: 70, height: 20)
+                        
+                        
+                    }.frame(height: UIScreen.main.bounds.height-100)
+                    
+                }
                 
                 
             }}
         
         .onAppear() {
             
-            animated()
-            
-            print(MyUserDefaults.getBool(forKey: Constants.isLoggedIn), Constants.isLoggedIn)
-            print(MyUserDefaults.getBool(forKey: Constants.isBaseLineSet), Constants.isBaseLineSet)
-            print(coughBaselineFetchResult.count,"count")
+            doAnimate()
         
         }.environment(\.managedObjectContext,viewContext)
         .background(Color.white.edgesIgnoringSafeArea(.all))
@@ -102,50 +126,22 @@ struct SplashView: View
     }
     
     
-    func saveData(){
+    func doAnimate() {
         
-//        print("aa")
-//
-//        let baseLine = CoughBaseline(context: viewContext)
-//
-//        baseLine.uid = "1"
-//        baseLine.createdOn = String(DateUtills.getCurrentTimeInMilliseconds())
-//
-//        let floatArray: [Float] = [0.131, 0.3232, 1.4334, 0.4334, 0.3422, 0.434343]
-////        let data = try? NSKeyedArchiver.archivedData(withRootObject: floatArray, requiringSecureCoding: false)
-//
-//        baseLine.setSegments(floatArray)
-//
-//        do {
-//            try viewContext.save()
-//            print("saved")
-//        } catch {
-//            // Handle the error
-//            print("Error saving data: \(error.localizedDescription)")
-//        }
-        
-    }
-    
-    func animated() {
-//        withAnimation(Animation.easeInOut(duration: 2.5)) {
-        withAnimation(Animation.easeInOut(duration: 0.5)) {
-            animate = true
-        }
-        delayedAction()
-    }
-    
-    func delayedAction()
-    {
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0)
-        {
-            withAnimation
-            {
-                self.isActive = true
+        DispatchQueue.main.async {
+            withAnimation(Animation.easeInOut(duration: 2.5)) {
+                animate = true
             }
         }
+       
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+               self.isActive = true
+           }
         
     }
+    
+    
 }
 
 

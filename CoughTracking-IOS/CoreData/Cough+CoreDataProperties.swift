@@ -2,7 +2,7 @@
 //  Cough+CoreDataProperties.swift
 //  
 //
-//  Created by Ali Rizwan on 20/09/2023.
+//  Created by Ali Rizwan on 27/09/2023.
 //
 //
 

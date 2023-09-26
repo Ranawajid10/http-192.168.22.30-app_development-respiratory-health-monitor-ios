@@ -11,18 +11,27 @@ import CoreData
 
 struct DashboardView: View {
     
+    
+    @Environment(\.managedObjectContext) private var viewContext
+    
+    
+    
+    
+    @AppStorage(Constants.isMicStopbyUser) var isMicStoppedByUser: Bool = false
+    
     @FetchRequest(entity: VolunteerCough.entity(), sortDescriptors: []) var allValunteerCoughFetchResult: FetchedResults<VolunteerCough>
-    @FetchRequest(entity: CoughTrackingHours.entity(), sortDescriptors: []) var coughTrackingHoursFetchResult: FetchedResults<CoughTrackingHours>
+    @FetchRequest(entity: TrackedHours.entity(), sortDescriptors: []) var coughTrackingHoursFetchResult: FetchedResults<TrackedHours>
+    @FetchRequest(entity: HoursUpload.entity(), sortDescriptors: []) var uploadTrackingHoursFetchResult: FetchedResults<HoursUpload>
     @FetchRequest(entity: Cough.entity(), sortDescriptors: []) var coughFetchResult: FetchedResults<Cough>
+    @FetchRequest(entity: UploadNotes.entity(), sortDescriptors: []) var uploadNotesFetchResult: FetchedResults<UploadNotes>
     
     @State var allCoughList:[Cough] = []
     
     
+    @ObservedObject var dashboardVM = DashboardVM()
     
-    @Environment(\.managedObjectContext) private var viewContext
+    @State  var showAlertOnNotificationOpen = false
     
-    @StateObject var dashboardVM = DashboardVM()
-    @State var showScheduleSheet = false
     @State var showMicStopSheet = false
     @State var showSyncDataSheet = false
     @State var isAnalyticsMode = false
@@ -42,9 +51,11 @@ struct DashboardView: View {
         ZStack {
             
             
+            
             VStack{
                 
-                HomeTopBar(dashboardVM: dashboardVM, showScheduleSheet:$showScheduleSheet,showSyncDataSheet:$showSyncDataSheet)
+                HomeTopBar(dashboardVM: dashboardVM,showSyncDataSheet:$showSyncDataSheet)
+                    .environment(\.managedObjectContext, viewContext)
                 
                 
                 
@@ -89,7 +100,8 @@ struct DashboardView: View {
                     
                 }
                 
-                CustomTabView(dashboardVM: dashboardVM, showMicSheet: $showMicStopSheet)
+                CustomTabView(dashboardVM: dashboardVM, showMicSheet: $showMicStopSheet,isMicStoppedByUser:$isMicStoppedByUser)
+                    .environment(\.managedObjectContext, viewContext)
                 
                 
             }
@@ -121,38 +133,67 @@ struct DashboardView: View {
         }.toastView(toast: $toast)
             .environment(\.managedObjectContext,viewContext)
             .navigationBarBackButtonHidden()
-            .sheet(isPresented: $showScheduleSheet) {
+            .navigationDestination(isPresented: $showSyncDataSheet, destination: {
                 
-                ScheduleMonitoringBottomSheet()
+                AllowSyncStatsView(text: "Save",allValunteerCoughList: $dashboardVM.valunteerCoughList ,uploadTrackingHoursList: $dashboardVM.uploadTrackingHoursList)
+                    .environment(\.managedObjectContext, viewContext)
+                
+            })
+            .sheet(isPresented: $dashboardVM.showScheduleSheet) {
+                
+                ScheduleMonitoringBottomSheet(dashboardVM: dashboardVM)
                     .presentationDetents([.medium])
                     .presentationCornerRadius(35)
                 
             }.sheet(isPresented: $showMicStopSheet) {
                 
-                MicStopBottomSheet(dashboardVM: dashboardVM, showStopMicSheet: $showMicStopSheet)
+                MicStopBottomSheet(dashboardVM: dashboardVM, showStopMicSheet: $showMicStopSheet,isMicStoppedByUser:$isMicStoppedByUser)
                     .presentationDetents([.height(100)])
                     .presentationCornerRadius(35)
                 
-            }.sheet(isPresented: $showSyncDataSheet) {
+            }.sheet(isPresented: $showAlertOnNotificationOpen) {
                 
-                SyncDataBottomSheet(dashboardVM: dashboardVM, showSyncDataSheet: $showSyncDataSheet)
-                    .presentationDetents([.height(170)])
+                StartScheduleMonitoringSheet(dashboardVM: dashboardVM, showNotificationOpenAlert: $showAlertOnNotificationOpen)
+                    .presentationDetents([.height(250)])
                     .presentationCornerRadius(35)
                 
-            }.onAppear{
+            }
+        //            .sheet(isPresented: $showSyncDataSheet) {
+        //
+        //                SyncDataBottomSheet(dashboardVM: dashboardVM, showSyncDataSheet: $showSyncDataSheet)
+        //                    .presentationDetents([.height(170)])
+        //                    .presentationCornerRadius(35)
+        //
+        //            }
+            .onAppear{
                 
+                showAlertOnNotificationOpen = MyUserDefaults.getBool(forKey: Constants.isFromNotification)
+                
+                dashboardVM.userData = MyUserDefaults.getUserData() ?? LoginResult()
                 allCoughList.removeAll()
+                dashboardVM.valunteerCoughList.removeAll()
+                dashboardVM.coughTrackHourList.removeAll()
+                dashboardVM.uploadTrackingHoursList.removeAll()
+                dashboardVM.uploadNotesList.removeAll()
                 
                 allCoughList =  Array(coughFetchResult)
                 
                 dashboardVM.valunteerCoughList = Array(allValunteerCoughFetchResult)
                 dashboardVM.coughTrackHourList = Array(coughTrackingHoursFetchResult)
+                dashboardVM.uploadTrackingHoursList =  Array(uploadTrackingHoursFetchResult)
+                dashboardVM.uploadNotesList =  Array(uploadNotesFetchResult)
+                
+                print("dashboardVM.valunteerCoughList",dashboardVM.valunteerCoughList.count)
                 
                 calculateTotalCoughHours()
-               
-                if(!MyUserDefaults.getBool(forKey: Constants.isMicStopbyUser)){
+                
+                if(!isMicStoppedByUser && !dashboardVM.isRecording){
                     dashboardVM.startRecording()
                 }
+                
+                
+               
+                
                 
                 
             }.onReceive(dashboardVM.$saveCough, perform:  { i in
@@ -164,24 +205,36 @@ struct DashboardView: View {
                 }
                 
                 
-            }).onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextObjectsDidChange)) { notification in
+            })
+            .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextObjectsDidChange)) { notification in
                 
-               
+                
                 dashboardVM.valunteerCoughList.removeAll()
                 dashboardVM.coughTrackHourList.removeAll()
+                dashboardVM.uploadTrackingHoursList.removeAll()
+                dashboardVM.uploadNotesList.removeAll()
                 
                 dashboardVM.coughTrackHourList = Array(coughTrackingHoursFetchResult)
                 dashboardVM.valunteerCoughList =  Array(allValunteerCoughFetchResult)
+                dashboardVM.uploadTrackingHoursList =  Array(uploadTrackingHoursFetchResult)
+                dashboardVM.uploadNotesList =  Array(uploadNotesFetchResult)
+                
+                
+                print("dashboardVM.valunteerCoughList",dashboardVM.valunteerCoughList.count)
                 
                 allCoughList =  Array(coughFetchResult)
                 totalCoughCount = allCoughList.count
                 calculateTotalCoughHours()
                 
-                if(MyUserDefaults.getBool(forKey:Constants.isCoughStatOn)){
+                
+                
+                if(MyUserDefaults.getBool(forKey:Constants.isAutoSync) && MyUserDefaults.getBool(forKey: Constants.isAutoDonate)){
                     
-                    if(allValunteerCoughFetchResult.count==5){
+                    print("DashboardView","uploaded not now", dashboardVM.valunteerCoughList.count)
+                    
+                    if(dashboardVM.valunteerCoughList.count>=5){
                         
-                        dashboardVM.decideCoughUpload()
+                        dashboardVM.calculateTrackedMinutes()
                         
                     }
                     
@@ -199,11 +252,30 @@ struct DashboardView: View {
                 }
                 
                 
-            }).onReceive(dashboardVM.$isDeleteAllCough, perform:  { i in
+            }).onReceive(dashboardVM.$isScheduled, perform:  { i in
                 
                 if(i){
                     
-                    deleteAllCoughs()
+                    toast = FancyToast(type: .success, title: "Success!", message: "Cough scheduled successfully")
+                    dashboardVM.isScheduled = false
+                    
+                }
+                
+                
+            }).onReceive(dashboardVM.$isUploaded, perform:  { i in
+                
+                if(i){
+                    
+                    deleteVolunteerCough()
+//                    deleteUploaddHour()
+                    
+                    uploadTrackingHoursFetchResult.nsSortDescriptors.removeAll()
+                    allValunteerCoughFetchResult.nsSortDescriptors.removeAll()
+                    dashboardVM.trackedSecondsByHour.removeAll()
+                    dashboardVM.uploadTrackingHoursList.removeAll()
+                    dashboardVM.valunteerCoughList.removeAll()
+                    
+                    print("DashboardView","uploded 5 coughs")
                     
                 }
                 
@@ -229,7 +301,7 @@ struct DashboardView: View {
         let totalSeconds = coughTrackingHoursFetchResult.reduce(0) { $0 + $1.secondsTrack }
         
         let hours =  totalSeconds/3600.0
-      
+        
         
         if(hours<1){
             
@@ -241,7 +313,7 @@ struct DashboardView: View {
             
         }
         
-        print("fff",totalTrackedHours,"------",coughTrackingHoursFetchResult.count)
+        print("DashboardView",totalTrackedHours,"------",coughTrackingHoursFetchResult.count)
         
         if(totalTrackedHours > 1 && coughsPerHour > 1){
             
@@ -269,27 +341,99 @@ struct DashboardView: View {
         
         let timeString = dateFormatter.string(from: currentDate)
         
+        let id = DateUtills.getCurrentTimeInMilliseconds()
         
-        let cough = Cough(context: viewContext)
         
-        cough.id = DateUtills.getCurrentTimeInMilliseconds()
-        cough.date = dateString
-        cough.time = timeString
-        cough.coughSegments = dashboardVM.segments
-        cough.coughPower = dashboardVM.coughPower
+        var uniqueSegments: [(key: [[Float]], value: String)] = []
         
-        do {
-            
-            try viewContext.save()
-            print("coredata","saved simple cough")
-            
-            saveVolunteerCough()
-            
-            
-        } catch {
-            // Handle the error
-            print("Error saving data: \(error.localizedDescription)")
+        for segment in dashboardVM.segments {
+            // Check if the segment's key is not already in uniqueSegments
+            if !uniqueSegments.contains(where: { (key, _) in key == segment.key }) {
+                uniqueSegments.append(segment)
+            }
         }
+        
+        
+        
+        for segmentPower in uniqueSegments {
+            
+            let segments = segmentPower.key
+            let power = segmentPower.value
+            
+            // Simple Cough
+            let cough = Cough(context: viewContext)
+            
+            cough.id = id
+            cough.date = dateString
+            //        cough.time = "08:00:03"
+            cough.time = timeString
+            cough.coughSegments = segments
+            cough.coughPower = power
+            
+            do {
+                
+                try viewContext.save()
+                
+            } catch {
+                // Handle the error
+                print("Error saving data: \(error.localizedDescription)")
+            }
+            
+            
+            
+            
+            // saveVolunteerCough
+            
+            
+            let volunteerCough = VolunteerCough(context: viewContext)
+            
+            volunteerCough.id = id
+            volunteerCough.date = dateString
+            volunteerCough.time = timeString
+            volunteerCough.coughSegments = segments
+            volunteerCough.coughPower = power
+            
+            do {
+                try viewContext.save()
+                
+                
+            } catch {
+                // Handle the error
+                print("Error saving data: \(error.localizedDescription)")
+            }
+            
+            
+            // saveNotesCough
+            
+            let coughNotes = CoughNotes(context: viewContext)
+            
+            coughNotes.id = id
+            coughNotes.date = dateString
+            coughNotes.time = timeString
+            coughNotes.coughSegments = segments
+            coughNotes.coughPower = power
+            coughNotes.url = ""
+            
+            do {
+                try viewContext.save()
+                
+                
+                dashboardVM.segments.removeAll()
+                dashboardVM.coughPower = ""
+                
+                
+            } catch {
+                // Handle the error
+                print("Error saving data: \(error.localizedDescription)")
+            }
+            
+            
+        }
+        
+        
+        
+        
+        
         
     }
     
@@ -314,8 +458,46 @@ struct DashboardView: View {
         volunteerCough.id = DateUtills.getCurrentTimeInMilliseconds()
         volunteerCough.date = dateString
         volunteerCough.time = timeString
-        volunteerCough.coughSegments = dashboardVM.segments
+        //        volunteerCough.coughSegments = dashboardVM.segments
         volunteerCough.coughPower = dashboardVM.coughPower
+        
+        do {
+            try viewContext.save()
+            saveNotesCough()
+            print("coredata","saved volunteer cough")
+            
+        } catch {
+            // Handle the error
+            print("Error saving data: \(error.localizedDescription)")
+        }
+        
+        
+    }
+    
+    func saveNotesCough(){
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        
+        let currentDate = Date()
+        
+        let dateString = dateFormatter.string(from: currentDate)
+        
+        
+        dateFormatter.dateFormat = "HH:mm:ss"
+        
+        let timeString = dateFormatter.string(from: currentDate)
+        
+        
+        let coughNotes = CoughNotes(context: viewContext)
+        
+        coughNotes.id = DateUtills.getCurrentTimeInMilliseconds()
+        coughNotes.date = dateString
+        coughNotes.time = timeString
+        //        coughNotes.coughSegments = dashboardVM.segments
+        coughNotes.coughPower = dashboardVM.coughPower
+        coughNotes.url = ""
         
         do {
             try viewContext.save()
@@ -335,26 +517,46 @@ struct DashboardView: View {
     
     func saveTrackedHours(){
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        let dateString = DateUtills.getCurrentDateInString(format: DateTimeFormats.dateTimeFormat1)
         
         
-        let currentDate = Date()
+        let coughTrackingHours = TrackedHours(context: viewContext)
         
-        let dateString = dateFormatter.string(from: currentDate)
-        
-        
-        let coughTrackingHours = CoughTrackingHours(context: viewContext)
-        
-        
+        coughTrackingHours.id = DateUtills.getCurrentTimeInMilliseconds()
         coughTrackingHours.date = dateString
         coughTrackingHours.secondsTrack = dashboardVM.totalSecondsRecordedToday
         
         do {
             
             try viewContext.save()
+            saveUploadTrackedHours()
             print("savedTrackedHours")
-            MyUserDefaults.saveString(forKey: "savedTrackedHours", value: "savedTrackedHours on " + DateUtills.getCurrentTimeInMilliseconds())
+            
+            
+        } catch {
+            // Handle the error
+            print("Error saving data: \(error.localizedDescription)")
+        }
+        
+    }
+    
+    func saveUploadTrackedHours(){
+        
+        
+        let dateString = DateUtills.getCurrentDateInString(format: DateTimeFormats.dateTimeFormat1)
+        
+        
+        let uploadTrackingHours = HoursUpload(context: viewContext)
+        
+        uploadTrackingHours.id = DateUtills.getCurrentTimeInMilliseconds()
+        uploadTrackingHours.dateTime = dateString
+        uploadTrackingHours.trackedSeconds = dashboardVM.totalSecondsRecordedToday
+        
+        do {
+            
+            try viewContext.save()
+            print("saveUploadTrackedHours")
             
             
         } catch {
@@ -365,16 +567,40 @@ struct DashboardView: View {
     }
     
     
-    func deleteAllCoughs(){
+    func deleteVolunteerCough() {
         
-        for cough in allValunteerCoughFetchResult {
+        for volunteerCough in allValunteerCoughFetchResult {
             
-            viewContext.delete(cough)
-            print("delete cough")
-            
+            viewContext.delete(volunteerCough)
+        
         }
         
+        for trackingHour in uploadTrackingHoursFetchResult {
+            
+            viewContext.delete(trackingHour)
         
+        }
+       
+        do {
+           
+            try viewContext.save()
+        } catch {
+            print("Error deleting data: \(error)")
+        }
+    }
+    
+    
+    func deleteUploaddHour() {
+        
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "HoursUpload")
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        
+        do {
+            try viewContext.execute(deleteRequest)
+            try viewContext.save()
+        } catch {
+            print("Error deleting data: \(error)")
+        }
     }
     
     
@@ -388,6 +614,10 @@ struct CustomTabView:View{
     @StateObject var dashboardVM : DashboardVM
     @Environment(\.managedObjectContext) private var viewContext
     @Binding var showMicSheet:Bool
+    @Binding var isMicStoppedByUser:Bool
+    
+    @State private var isScaling = false
+    
     
     var body: some View{
         
@@ -403,18 +633,28 @@ struct CustomTabView:View{
                 
             }, label: {
                 
-                VStack{
-                    
-                    Image("microphone")
-                    
-                }.frame(width: 48,height: 48)
-                    .background(Color.appColorBlue)
-                    .cornerRadius(24)
-                
-                
-                
+                Image("microphone_bg")
+                    .overlay {
+                        
+                        VStack{
+                            
+                            Image(isMicStoppedByUser ?  "mircrophone_play" : "mircrophone_paused")
+                                .resizable()
+                                .frame(width: 45,height: 45)
+                            
+                            
+                        }.frame(width: 48,height: 48)
+                            .background(Color.appColorBlue)
+                            .cornerRadius(24)
+                        
+                    }.scaleEffect(isScaling  ? 1.1 : 1.0)
                 
             }).padding(.bottom,-30)
+                .onAppear{
+                    
+                    //                   startScalingAnimation()
+                    
+                }
             
             ZStack {
                 
@@ -466,7 +706,20 @@ struct CustomTabView:View{
         
         
     }
-    
+    private func startScalingAnimation() {
+        // Check if mic is not stopped and isScaling is true
+        if isMicStoppedByUser && !isScaling {
+            // Stop the scale animation
+            withAnimation {
+                isScaling = false
+            }
+        } else if !isMicStoppedByUser && !isScaling {
+            // Start the scale animation
+            withAnimation(Animation.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                isScaling = true
+            }
+        }
+    }
     
 }
 
@@ -478,12 +731,39 @@ struct DashboardView_Previews: PreviewProvider {
     }
 }
 
+
+struct RotatingImage: View {
+    @ObservedObject var dashboardVM:DashboardVM
+    @State private var isRotating = false
+    
+    var body: some View {
+        Image("reload")
+            .foregroundColor(dashboardVM.isLoading ? .green : .appColorBlue)
+            .rotationEffect(.degrees(isRotating ? 360 : 0))
+            .onAppear() {
+                // Start rotating when the view appears
+                self.startRotating()
+            }
+    }
+    
+    func startRotating() {
+        withAnimation(Animation.linear(duration: 2.0).repeatForever(autoreverses: true)) {
+            self.isRotating = true
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            withAnimation(.linear(duration: 2.0).repeatForever(autoreverses: true)) {
+                self.isRotating = false
+            }
+        }
+    }
+}
+
 struct HomeTopBar: View {
     
     
     @ObservedObject  var dashboardVM:DashboardVM
     
-    @Binding var showScheduleSheet:Bool
     @Binding var showSyncDataSheet:Bool
     @Environment(\.managedObjectContext) private var viewContext
     
@@ -492,7 +772,7 @@ struct HomeTopBar: View {
             
             Button {
                 
-                showScheduleSheet = true
+                dashboardVM.showScheduleSheet = true
                 
             } label: {
                 
@@ -501,13 +781,25 @@ struct HomeTopBar: View {
             }
             
             
-            Button {
+            NavigationLink {
                 
-                showSyncDataSheet.toggle()
+                AllowSyncStatsView(text: "Save",allValunteerCoughList: $dashboardVM.valunteerCoughList ,uploadTrackingHoursList: $dashboardVM.uploadTrackingHoursList)
+                    .environment(\.managedObjectContext, viewContext)
+                //                showSyncDataSheet = true
+                
                 
             } label: {
                 
-                Image("reload")
+                if(MyUserDefaults.getBool(forKey: Constants.isAutoDonate)){
+                    
+                    RotatingImage(dashboardVM: dashboardVM)
+                    
+                }else{
+                    
+                    Image("reload")
+                        
+                    
+                }
                 
             }.padding(.leading)
             
@@ -525,9 +817,9 @@ struct HomeTopBar: View {
                 
                 NotesView(dashboardVM: dashboardVM)
                     .environment(\.managedObjectContext, viewContext)
-//                    .onAppear{
-//                        dashboardVM.stopRecording()
-//                    }
+                //                    .onAppear{
+                //                        dashboardVM.stopRecording()
+                //                    }
                 
             } label: {
                 
@@ -567,23 +859,15 @@ struct HomeTopBar: View {
 
 struct ScheduleMonitoringBottomSheet:View{
     
+    @ObservedObject var dashboardVM:DashboardVM
     @State var currentHourFormatted = ""
     @State var currentHour: Int = Calendar.current.component(.hour, from: Date())
     @State var currentMinute: Int = Calendar.current.component(.minute, from: Date())
     
     
-    @State var fromSelectedHour = 0
-    @State var fromSelectedMin = 0
-    @State var fromSelectedAM = 0
+    @State private var toast: FancyToast? = nil
     
     
-    @State var toSelectedHour = 0
-    @State var toSelectedMin = 0
-    @State var toSelectedAM = 0
-    
-    
-    @State var isDayOn = false
-    @State var isNightOn = false
     
     var timeFormatter: DateFormatter {
         let formatter = DateFormatter()
@@ -618,7 +902,7 @@ struct ScheduleMonitoringBottomSheet:View{
                 
                 Button {
                     
-                    
+                    dashboardVM.scheduleNotification()
                     
                 } label: {
                     
@@ -636,10 +920,9 @@ struct ScheduleMonitoringBottomSheet:View{
             
             HStack{
                 
-                Picker("", selection: $fromSelectedHour) {
+                Picker("", selection: $dashboardVM.fromSelectedHour) {
                     
                     ForEach(1..<13){ i in
-                        
                         
                         Text(String(format: "%0\(2)d", i))
                             .modifier(LatoFontModifier(fontWeight: .bold, fontSize:16))
@@ -653,8 +936,8 @@ struct ScheduleMonitoringBottomSheet:View{
                     .onAppear{
                         
                         currentHourFormatted = timeFormatter.string(from: Date())
-                        fromSelectedHour = Int(currentHourFormatted) ?? 1
-                        fromSelectedHour-=1
+                        dashboardVM.fromSelectedHour = Int(currentHourFormatted) ?? 1
+                        dashboardVM.fromSelectedHour-=1
                     }
                 
                 
@@ -662,7 +945,7 @@ struct ScheduleMonitoringBottomSheet:View{
                     .foregroundColor(.black)
                     .modifier(LatoFontModifier(fontWeight: .medium, fontSize: 16))
                 
-                Picker("", selection: $fromSelectedMin) {
+                Picker("", selection: $dashboardVM.fromSelectedMin) {
                     
                     ForEach(1..<60){ i in
                         
@@ -676,11 +959,11 @@ struct ScheduleMonitoringBottomSheet:View{
                     .frame(height: 100)
                     .onAppear{
                         
-                        fromSelectedMin = currentMinute
+                        dashboardVM.fromSelectedMin = currentMinute
                         
                     }
                 
-                Picker("", selection: $fromSelectedAM) {
+                Picker("", selection: $dashboardVM.fromSelectedAM) {
                     
                     ForEach(0..<2){ i in
                         
@@ -695,7 +978,7 @@ struct ScheduleMonitoringBottomSheet:View{
                     .onAppear{
                         
                         currentHourFormatted = amPmFormatter.string(from: Date())
-                        fromSelectedAM = currentHourFormatted == "AM" ? 0 : 1
+                        dashboardVM.fromSelectedAM = currentHourFormatted == "AM" ? 0 : 1
                         
                     }
                 
@@ -708,7 +991,7 @@ struct ScheduleMonitoringBottomSheet:View{
             
             HStack{
                 
-                Picker("", selection: $toSelectedHour) {
+                Picker("", selection: $dashboardVM.toSelectedHour) {
                     
                     ForEach(1..<13){ i in
                         
@@ -723,8 +1006,8 @@ struct ScheduleMonitoringBottomSheet:View{
                     .onAppear{
                         
                         currentHourFormatted = timeFormatter.string(from: Date())
-                        toSelectedHour = Int(currentHourFormatted) ?? 1
-                        toSelectedHour-=1
+                        dashboardVM.toSelectedHour = Int(currentHourFormatted) ?? 1
+                        dashboardVM.toSelectedHour-=1
                         
                     }
                 
@@ -733,7 +1016,7 @@ struct ScheduleMonitoringBottomSheet:View{
                     .foregroundColor(.black)
                     .modifier(LatoFontModifier(fontWeight: .medium, fontSize: 16))
                 
-                Picker("", selection: $toSelectedMin) {
+                Picker("", selection: $dashboardVM.toSelectedMin) {
                     
                     ForEach(1..<60){ i in
                         
@@ -747,11 +1030,11 @@ struct ScheduleMonitoringBottomSheet:View{
                     .frame(height: 100)
                     .onAppear{
                         
-                        toSelectedMin = currentMinute
+                        dashboardVM.toSelectedMin = currentMinute
                         
                     }
                 
-                Picker("", selection: $toSelectedAM) {
+                Picker("", selection: $dashboardVM.toSelectedAM) {
                     
                     ForEach(0..<2){ i in
                         
@@ -766,7 +1049,7 @@ struct ScheduleMonitoringBottomSheet:View{
                     .onAppear{
                         
                         currentHourFormatted = amPmFormatter.string(from: Date())
-                        toSelectedAM = currentHourFormatted == "AM" ? 0 : 1
+                        dashboardVM.toSelectedAM = currentHourFormatted == "AM" ? 0 : 1
                         
                     }
                 
@@ -774,36 +1057,25 @@ struct ScheduleMonitoringBottomSheet:View{
                 
             }
             
-//
-//            Spacer()
-//
-//
-//            Toggle(isOn: $isDayOn) {
-//
-//                Text("Day")
-//                    .foregroundColor(.black)
-//                    .modifier(LatoFontModifier(fontWeight: .bold, fontSize: 18))
-//
-//            }.padding(.horizontal)
-//                .backgroundStyle(Color.appColorBlue)
-//
-//
-//
-//            Toggle(isOn: $isNightOn) {
-//
-//                Text("Night")
-//                    .foregroundColor(.black)
-//                    .modifier(LatoFontModifier(fontWeight: .bold, fontSize: 18))
-//
-//            }.padding(.horizontal)
             
             
             Spacer()
             
-        }.padding(.top)
+        }.toastView(toast: $toast)
+            .padding(.top)
             .padding(.horizontal)
             .background(Color.screenBG)
-        
+            .onReceive(dashboardVM.$isError, perform:  { i in
+                
+                if(i){
+                    
+                    toast = FancyToast(type: .error, title: "Error occurred!", message: dashboardVM.errorMessage)
+                    dashboardVM.isError = false
+                    
+                }
+                
+                
+            })
         
         
         
@@ -817,6 +1089,7 @@ struct MicStopBottomSheet:View{
     
     @StateObject var dashboardVM : DashboardVM
     @Binding var showStopMicSheet:Bool
+    @Binding var isMicStoppedByUser:Bool
     
     var body: some View{
         
@@ -829,18 +1102,28 @@ struct MicStopBottomSheet:View{
             
             Button {
                 
-                dashboardVM.stopRecording()
-                MyUserDefaults.saveBool(forKey: Constants.isMicStopbyUser, value: true)
+                if(isMicStoppedByUser){
+                    
+                    dashboardVM.startRecording()
+                    isMicStoppedByUser = false
+                    
+                }else{
+                    
+                    dashboardVM.stopRecording()
+                    isMicStoppedByUser = true
+                    
+                }
+                
                 showStopMicSheet.toggle()
                 
             } label: {
                 
                 
-                Text("Stop")
-                    .foregroundColor(Color.red)
+                Text(isMicStoppedByUser ? "Start" : "Stop")
+                    .foregroundColor(isMicStoppedByUser ? Color.white : Color.red)
                     .modifier(LatoFontModifier(fontWeight: .bold, fontSize: 16))
                     .frame(width: UIScreen.main.bounds.width-60,height: 42)
-                    .background(Color.lightBlue)
+                    .background(isMicStoppedByUser ? Color.appColorBlue : Color.lightBlue)
                     .cornerRadius(40)
                 
                 
@@ -912,7 +1195,7 @@ struct SyncDataBottomSheet:View{
                     MyUserDefaults.saveBool(forKey: Constants.isCoughStatOn, value: isCoughOn)
                     MyUserDefaults.saveBool(forKey: Constants.isStatisticsOn, value: isStatisticsOn)
                     
-                    dashboardVM.decideCoughUpload()
+                    //                    dashboardVM.decideCoughUpload()
                     
                     
                 }else{
@@ -939,7 +1222,7 @@ struct SyncDataBottomSheet:View{
             .padding(.top)
             .padding(.horizontal)
             .background(Color.screenBG)
-            .onChange(of: isError){ newValue in
+            .onChange(of: isError){ oldValue, newValue in
                 
                 if(newValue){
                     
@@ -955,3 +1238,95 @@ struct SyncDataBottomSheet:View{
     
     
 }
+
+struct StartScheduleMonitoringSheet:View {
+    
+    @ObservedObject var dashboardVM:DashboardVM
+    @Binding var showNotificationOpenAlert:Bool
+    
+    
+    
+    
+    var body: some View {
+        
+        VStack{
+            
+            Color.black
+                .frame(width: 40,height: 3)
+                .cornerRadius(2)
+            
+            
+            Text("Schedule Monitoring")
+                .foregroundColor(.black)
+                .modifier(LatoFontModifier(fontWeight: .bold, fontSize: 18))
+                .padding(.top,8)
+            
+            Text("Would you like to track your coughs in the background?")
+                .foregroundColor(.black)
+                .modifier(LatoFontModifier(fontWeight: .regular, fontSize: 14))
+                .padding(.top)
+            
+            Spacer()
+            
+            HStack(spacing: 20){
+                
+                Button {
+                    
+                    MyUserDefaults.removeDate(key: Constants.scheduledToDate)
+                    MyUserDefaults.saveBool(forKey: Constants.isFromNotification, value: false)
+                    showNotificationOpenAlert.toggle()
+                    
+                } label: {
+                    
+                    
+                    Text("No")
+                        .font(.system(size: 16))
+                        .foregroundColor(Color.black)
+                    
+                    
+                }.frame(width: (UIScreen.main.bounds.width/2)-50,height: 42)
+                    .background(Color.white)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 40)
+                            .stroke(Color.appColorBlue, lineWidth: 2)
+                    )
+                
+                Button {
+                    
+                    if(!dashboardVM.isRecording){
+                        
+                        dashboardVM.stopRecording()
+                        
+                    }
+                    
+                    MyUserDefaults.saveBool(forKey: Constants.isFromNotification, value: false)
+                    showNotificationOpenAlert.toggle()
+                    UIControl().sendAction(#selector(NSXPCConnection.suspend),
+                                           to: UIApplication.shared, for: nil)
+                    
+                } label: {
+                    
+                    
+                    Text("Yes")
+                        .font(.system(size: 16))
+                        .foregroundColor(Color.white)
+                    
+                    
+                }.frame(width: (UIScreen.main.bounds.width/2)-50,height: 42)
+                    .background(Color.appColorBlue)
+                    .cornerRadius(40)
+                
+                
+            }.padding(.vertical)
+            
+            Spacer()
+            
+        }
+        .frame(width: UIScreen.main.bounds.width)
+        .padding(.top)
+        .padding(.horizontal)
+        .background(Color.screenBG)
+        
+    }
+}
+

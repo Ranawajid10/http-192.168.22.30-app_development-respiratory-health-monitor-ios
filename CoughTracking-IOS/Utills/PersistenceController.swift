@@ -17,7 +17,7 @@ struct PersistenceController {
         container = NSPersistentContainer(name: "CoughMoniterCoreModel")
         container.loadPersistentStores { description, error in
             if let error = error {
-                fatalError("Error: \(error.localizedDescription)")
+                fatalError("Error1: \(error.localizedDescription)")
             }
         }
     }

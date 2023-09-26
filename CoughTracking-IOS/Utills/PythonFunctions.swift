@@ -109,7 +109,6 @@ class PythonFunctions{
             
             
             guard let interpreter = try? TensorFlowLite.Interpreter(modelPath: modelPath ) else {
-                print("dsds")
                 return (segmentWav,probs)
             }
             
@@ -138,14 +137,7 @@ class PythonFunctions{
                     for x in segments {
                         
                         let xPadder = self.padder(data: x)
-                        
-                        //                            print("xpadder",xPadder,"---",counter)
-                        
-                        //                            let inputData = [x]
-                        
-                        
-                        //                            do{
-                        //
+                       
                         let data = Data(buffer: UnsafeBufferPointer(start: xPadder, count: xPadder.count))
                         
                         try? interpreter.copy(data, toInputAt: 0)
@@ -281,12 +273,9 @@ class PythonFunctions{
     
     static func powerByAVFoundation(_ x: [Float], _ fs: Float,buffer: AVAudioPCMBuffer) -> Float {
         
-        print("in powerByAVFoundation")
-        
+       
         let integratedLoudness = self.calculateLoudness(buffer)
         
-        
-        print("out powerByAVFoundation---",integratedLoudness)
         
         
         return integratedLoudness
@@ -295,7 +284,7 @@ class PythonFunctions{
     static func dbScalerSwift(_ x: [Float], _ fs: Float,buffer: AVAudioPCMBuffer) -> [Float] {
         // Measure loudness using AVAudioEngine (you can use the powerByAVFoundation function from the previous example)
         
-        print("in dbScalerSwift")
+        
         let integratedLoudness = self.powerByAVFoundation(x, fs,buffer: buffer)
         
         print("Loudness: \(integratedLoudness)")
@@ -316,7 +305,7 @@ class PythonFunctions{
     
     // Main function for cough segmentation
     static func coughSegmenter(xOrig: [Float], fs: Float,buffer: AVAudioPCMBuffer) -> ([[Float]], Float) {
-        print("in coughSegmenter")
+        
         let xOrigNormalized = normalizeAudio(xOrig)
         let xDB = dbScalerSwift(xOrig, fs,buffer: buffer)
         // Calculate reference power using your logic (not implemented here)
@@ -517,6 +506,8 @@ class PythonFunctions{
         
         // Call cough_event_inference and other functions as needed
         let (pred, probs) = coughEventInference(array)
+        
+        print("pre",pred)
         
         if pred == 1 {
             

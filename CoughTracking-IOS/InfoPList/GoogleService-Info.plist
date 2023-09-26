@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>163015622468-43kq6hrmffd8ipnhjne1n7to31hf5ubn.apps.googleusercontent.com</string>
+	<string>163015622468-llnv9nkc8o9b270e35kut599jleouj2l.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.163015622468-43kq6hrmffd8ipnhjne1n7to31hf5ubn</string>
+	<string>com.googleusercontent.apps.163015622468-llnv9nkc8o9b270e35kut599jleouj2l</string>
 	<key>ANDROID_CLIENT_ID</key>
 	<string>163015622468-2i2c5d0nf9hb50fk976qsvlk6b4r2dee.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
@@ -21,15 +21,15 @@
 	<key>STORAGE_BUCKET</key>
 	<string>cough-tracking.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
-	<false/>
+	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
-	<false/>
+	<false></false>
 	<key>IS_APPINVITE_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>IS_GCM_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>IS_SIGNIN_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>GOOGLE_APP_ID</key>
 	<string>1:163015622468:ios:c6ba07919a6dc9a6c7a111</string>
 </dict>

@@ -12,32 +12,12 @@ struct WeeklyCoughsView: View {
     
     @ObservedObject var dashboardVM:DashboardVM
     @Binding var allCoughList:[Cough]
-    @Binding var hourTrackedList:[CoughTrackingHours]
+    @Binding var hourTrackedList:[TrackedHours]
     
-    var weekOfDayArray = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat","Sun"]
+   
+    @StateObject var weeklyCoughVM = WeeklyCoughVM()
     
-    @State var totalCoughCount:Int = 0
-    @State var totalTrackedHours:Double = 0.0
-    @State var coughsPerHour:Int = 0
-    
-    @State private var selectedDate = Date()
-    @State var currentWeekRange: (start: Date, end: Date)? = nil
-    
-    @State private var startDate = Date()
-    @State private var endDate = Date()
-    @State  var weekRangeText = ""
-    
-    
-    
-    @State var moderateTimeData: [String: Int] = [:]
-    @State var severeTimeData: [String: Int] = [:]
-    
-    @State var sortedModerateTimeDataDictionary: [(key: String, value: Int)]  = []
-    @State var sortedSevereTimeDataDictionary: [(key: String, value: Int)] = []
-    
-    @State var userData = LoginResult()
-    
-    @State var changeGraph:Int = 0
+   
     
     @Environment(\.managedObjectContext) private var viewContext
     
@@ -47,17 +27,17 @@ struct WeeklyCoughsView: View {
                 VStack {
                     
                     
-                    WeeklySelectionView(selectedDate: $selectedDate,startDate: $startDate,endDate: $endDate, weekRangeText: $weekRangeText)
+                    WeeklySelectionView(weeklyCoughVM: weeklyCoughVM)
                     
-                    HourlyReportView(totalCoughCount: $totalCoughCount, totalTrackedHours: $totalTrackedHours, coughsPerHour: $coughsPerHour)
+                    HourlyReportView(totalCoughCount: $weeklyCoughVM.totalCoughCount, totalTrackedHours: $weeklyCoughVM.totalTrackedHours, coughsPerHour: $weeklyCoughVM.coughsPerHour)
                     
                     
                     HourlyCoughGraph()
                     
                     
-                    WeeklyGraphView(moderateCoughData: $sortedModerateTimeDataDictionary, severeCoughData: $sortedSevereTimeDataDictionary)
+                    WeeklyGraphView(moderateCoughData: $weeklyCoughVM.sortedModerateTimeDataDictionary, severeCoughData: $weeklyCoughVM.sortedSevereTimeDataDictionary)
                         .frame(height: 350)
-                        .id(changeGraph)
+                        .id(weeklyCoughVM.changeGraph)
                     
                     HStack{
                         
@@ -70,7 +50,7 @@ struct WeeklyCoughsView: View {
                         
                     }
                     
-                    if(MyUserDefaults.getBool(forKey: Constants.isAutoDonate)){
+                    if(!MyUserDefaults.getBool(forKey: Constants.isAutoDonate)){
                         HStack{
                             
                             Image("help")
@@ -97,18 +77,20 @@ struct WeeklyCoughsView: View {
                         
                         NavigationLink {
                             
-                            if(userData.age==nil && userData.gender==nil && userData.ethnicity==nil){
-                                
-                                BecomeVolunteerView(dashboardVM: dashboardVM, allCoughList: $allCoughList)
-                                    .environment(\.managedObjectContext, viewContext)
-                                
-                            }else{
-                                
-                                VolunteerParticipationView(dashboardVM: dashboardVM)
-                                    .environment(\.managedObjectContext, viewContext)
-                                
-                                
-                            }
+                            AllowSyncStatsView(text: "Save",allValunteerCoughList: $dashboardVM.valunteerCoughList ,uploadTrackingHoursList: $dashboardVM.uploadTrackingHoursList)
+                                .environment(\.managedObjectContext, viewContext)
+//                            if(userData.age==nil && userData.gender==nil && userData.ethnicity==nil){
+//
+//                                BecomeVolunteerView(dashboardVM: dashboardVM, allCoughList: $allCoughList)
+//                                    .environment(\.managedObjectContext, viewContext)
+//
+//                            }else{
+//
+//                                VolunteerParticipationView(dashboardVM: dashboardVM)
+//                                    .environment(\.managedObjectContext, viewContext)
+//
+//
+//                            }
                             
                         } label: {
                             
@@ -129,189 +111,43 @@ struct WeeklyCoughsView: View {
                     
                 }
             }
-        }.onChange(of: selectedDate, perform: { newValue in
+        }.onAppear{
             
-            getGraphData()
+            weeklyCoughVM.allCoughList.removeAll()
+            weeklyCoughVM.hourTrackedList.removeAll()
             
-        }).onAppear{
+            weeklyCoughVM.allCoughList = allCoughList
+            weeklyCoughVM.hourTrackedList = hourTrackedList
             
-            userData = MyUserDefaults.getUserData() ?? LoginResult()
-            getGraphData()
+            weeklyCoughVM.userData = MyUserDefaults.getUserData() ?? LoginResult()
+            weeklyCoughVM.getGraphData()
             
         }.onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextObjectsDidChange)) { _ in
             
-            getGraphData()
+            weeklyCoughVM.allCoughList.removeAll()
+            weeklyCoughVM.hourTrackedList.removeAll()
+            
+            weeklyCoughVM.allCoughList = allCoughList
+            weeklyCoughVM.hourTrackedList = hourTrackedList
+            
+            weeklyCoughVM.getGraphData()
             
         }
     }
     
     
-    func getGraphData() {
-        // Get the start and end dates of the current week
-        currentWeekRange = DateUtills.getCurrentWeekRange(date: selectedDate)
-        startDate = currentWeekRange?.start ?? Date()
-        endDate = currentWeekRange?.end ?? Date()
-
-        weekRangeText = DateUtills.dateRangeText(startDate: startDate, endDate: endDate)
-
-        let (currentDateCoughs, _) = getCurrentWeekCoughs()
-
-        totalCoughCount = currentDateCoughs.count
-        
-        calculateCurrentCoughHours()
-
-        moderateTimeData.removeAll()
-        severeTimeData.removeAll()
-
-        // Initialize the dictionary with the days of the week as keys
-        for day in weekOfDayArray {
-            moderateTimeData[day, default: 0] = 0
-            severeTimeData[day, default: 0] = 0
-        }
-
-        for cough in currentDateCoughs {
-            guard let coughDate = cough.date,
-                  let coughPower = cough.coughPower else {
-                continue
-            }
-
-            let coughDate1 = DateUtills.stringToDate(date: coughDate, dateFormat: DateFormats.dateFormat1)
-            let weekOfDay = DateUtills.getDayOfWeek(dateString: coughDate, dateFormat: DateFormats.dateFormat1)
-
-            // Check if the cough date is within the specified date range
-            if coughDate1 >= startDate && coughDate1 <= endDate {
-                if let dayValue = weekOfDayArray.firstIndex(of: weekOfDay) {
-                    let dayKey = weekOfDayArray[dayValue]
-                    if coughPower == "moderate" {
-                        moderateTimeData[dayKey, default: 0] += 1
-                    } else if coughPower == "severe" {
-                        severeTimeData[dayKey, default: 0] += 1
-                    }
-                }
-            }
-        }
-
-        // Create a new dictionary with sorted keys and their corresponding values
-        sortedModerateTimeDataDictionary.removeAll()
-        sortedSevereTimeDataDictionary.removeAll()
-
-        let moderateList = moderateTimeData.sorted { v1, v2 in
-            return weekOfDayArray.firstIndex(of: v1.key) ?? 0 < weekOfDayArray.firstIndex(of: v2.key) ?? 0
-        }
-
-        sortedModerateTimeDataDictionary = moderateList
-
-        let severeList = severeTimeData.sorted { v1, v2 in
-            return weekOfDayArray.firstIndex(of: v1.key) ?? 0 < weekOfDayArray.firstIndex(of: v2.key) ?? 0
-        }
-
-        sortedSevereTimeDataDictionary = severeList
-
-        changeGraph += 1
-    }
-
-
     
-    
-    func calculateCurrentCoughHours(){
-        
-        totalTrackedHours = 0
-        coughsPerHour = 0
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        
-        
-//        let startDateString = dateFormatter.string(from: startDate)
-//        let endDateString = dateFormatter.string(from: endDate)
-        
-        var totalSeconds = 0.0
-        
-        for second in hourTrackedList {
-            
-            let trackDate = dateFormatter.date(from: second.date ?? "") ??  Date()
-            
-            if trackDate >= startDate && trackDate <= endDate {
-                
-                totalSeconds+=second.secondsTrack
-                
-            }
-            
-        }
-        
-        
-        let hours =  totalSeconds/3600.0
-        
-       
-        
-        if(hours<1){
-            
-            totalTrackedHours = 1
-            
-        }else{
-            
-            totalTrackedHours =  totalSeconds/3600.0
-            
-        }
-        
-        
-    
-        
-        coughsPerHour = totalCoughCount / Int(totalTrackedHours)
-        
-        print("totalSeconds",totalSeconds,"--hours",hours,"--coughsPerHour",coughsPerHour,"--totalCoughCount",totalCoughCount,"--totalTrackedHours",totalTrackedHours)
-        
-    }
-    
-    
-    func getCurrentWeekCoughs() -> ([Cough],[String]){
-        
-        var currentDateCoughsList:[Cough] = []
-        
-        var coughTimes: [String] = []
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-
-//        var star
-        print("startDate",startDate,"-----","endDate",endDate)
-//
-//        let dateString = dateFormatter.string(from: selectedDate)
-        
-        
-        for cough in allCoughList {
-            
-            let trackDate = dateFormatter.date(from: cough.date ?? "") ??  Date()
-            
-            if trackDate >= startDate && trackDate <= endDate {
-                
-                
-                let coughTime = cough.time?.components(separatedBy: ":").first ?? ""
-                
-                
-                coughTimes.append(coughTime)
-                currentDateCoughsList.append(cough)
-                
-                
-            }
-            
-            
-            
-        }
-        
-        
-        return (currentDateCoughsList,coughTimes)
-    }
 }
 
 
 struct WeeklySelectionView: View {
     
-    @Binding var selectedDate:Date
-    @Binding var startDate:Date
-    @Binding var endDate:Date
+    @ObservedObject var weeklyCoughVM:WeeklyCoughVM
+//    @Binding var selectedDate:Date
+//    @Binding var startDate:Date
+//    @Binding var endDate:Date
     
-    @Binding var weekRangeText:String
+//    @Binding var weekRangeText:String
     
     var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
@@ -329,21 +165,33 @@ struct WeeklySelectionView: View {
                 
                 withAnimation {
                     
-                    previous()
+                    if(!weeklyCoughVM.isLoading){
+                        weeklyCoughVM.previous()
+                    }
+                    
                     
                 }
                 
             } label: {
             
-                Image(systemName: "chevron.backward")
-                    .foregroundColor(Color.black)
+                if(weeklyCoughVM.isLoading && weeklyCoughVM.loaderPos == 1){
+                    
+                    ProgressView()
+                        .tint(Color.black)
+                    
+                }else{
+                    
+                    Image(systemName: "chevron.backward")
+                        .foregroundColor(Color.black)
+                    
+                }
                 
             }.frame(width: 20,height: 20)
             
             Spacer()
             
             //            Text(isToday(selectedDate) ? "Today" : dateFormatter.string(from: selectedDate))
-            Text(weekRangeText)
+            Text(weeklyCoughVM.weekRangeText)
 //                .onAppear{
 //
 //                    let currentWeekRange = getCurrentWeekRange(date: selectedDate)
@@ -361,41 +209,32 @@ struct WeeklySelectionView: View {
                 
                 withAnimation {
                     
-                    next()
+                    if(!weeklyCoughVM.isLoading){
+                        weeklyCoughVM.next()
+                    }
                     
                 }
                 
             } label: {
                 
-                Image(systemName: "chevron.forward")
-                    .foregroundColor(Color.black)
+                if(weeklyCoughVM.isLoading && weeklyCoughVM.loaderPos == 0){
+                    
+                    ProgressView()
+                        .tint(Color.black)
+                    
+                }else{
+                    
+                    Image(systemName: "chevron.forward")
+                        .foregroundColor(Color.black)
+                    
+                }
                 
             }.frame(width: 20,height: 20)
-            .disabled(Calendar.current.isDateInTomorrow(selectedDate))
+                .disabled(Calendar.current.isDateInTomorrow(weeklyCoughVM.selectedDate))
             
         }
         .padding(.horizontal, 32)
        
-    }
-    
-    func next(){
-        
-        let date = selectedDate
-        
-        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: date) ?? Date()
-        if tomorrow <= Date() {
-            selectedDate = DateUtills.getNextWeekMonday( selectedDate)
-        }
-        
-        
-    }
-    
-    func previous(){
-        
-        
-        selectedDate = DateUtills.getPreviousWeekMonday(selectedDate)
-        
-        
     }
     
     

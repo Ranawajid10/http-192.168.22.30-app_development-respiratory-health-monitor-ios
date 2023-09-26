@@ -9,8 +9,26 @@ import SwiftUI
 
 struct ClearHistoryView: View {
     
+    @Environment(\.managedObjectContext) private var viewContext
+    
+    @FetchRequest(entity: Cough.entity(), sortDescriptors: []) var coughFetchResult: FetchedResults<Cough>
+    @FetchRequest(entity: CoughNotes.entity(), sortDescriptors: []) var coughNotesFetchResult: FetchedResults<CoughNotes>
+    @FetchRequest(entity: HoursUpload.entity(), sortDescriptors: []) var hoursUploadFetchResult: FetchedResults<HoursUpload>
+    @FetchRequest(entity: Notes.entity(), sortDescriptors: []) var notesFetchResult: FetchedResults<Notes>
+    @FetchRequest(entity: TrackedHours.entity(), sortDescriptors: []) var trackedHourFetchResult: FetchedResults<TrackedHours>
+    @FetchRequest(entity: VolunteerCough.entity(), sortDescriptors: []) var volunteerCoughFetchResult: FetchedResults<VolunteerCough>
+    
+    
+    @State var isLoading = false
+    @State var isCleared = false
+    
+    
     @State var isRangeExpended = false
     @State var showAlert = false
+    @State var selectedRange = "Select Range"
+    @State var days = 0
+    
+    @State private var toast: FancyToast? = nil
     
     
     var body: some View {
@@ -24,20 +42,49 @@ struct ClearHistoryView: View {
                     Spacer()
                 }
                 
-                DisclosureGroup("Select Range", isExpanded: $isRangeExpended) {
+                DisclosureGroup(selectedRange, isExpanded: $isRangeExpended) {
                     
                     ForEach(0..<Constants.clearHistoryList.count,id: \.self){ index in
                         
-                        HStack {
-                           
-                            Text(Constants.clearHistoryList[index])
-                                .foregroundColor(.black)
-                            .modifier(LatoFontModifier(fontWeight: .regular, fontSize: 16))
-                            .padding(.top)
+                        Button {
                             
-                            Spacer()
-                        }
+                            withAnimation {
+                                isRangeExpended.toggle()
+                                selectedRange = Constants.clearHistoryList[index]
+                               
+                                if(index==0){
+                               
+                                    days = 7
+                               
+                                }else if(index==1){
+                               
+                                    days = 14
+                               
+                                }else if(index==2){
                                 
+                                    days = 30
+                               
+                                }
+                                
+                            }
+                            
+                        } label: {
+                            
+                            HStack {
+                                
+                                Text(Constants.clearHistoryList[index])
+                                    .foregroundColor(.black)
+                                    .modifier(LatoFontModifier(fontWeight: .regular, fontSize: 16))
+                                    .padding(.top)
+                                
+                                Spacer()
+                            }
+                            
+                        }
+                        
+                        
+                        
+                        
                         
                     }
                     
@@ -59,25 +106,208 @@ struct ClearHistoryView: View {
                     Text("Clear")
                         .font(.system(size: 16))
                         .foregroundColor(Color.white)
+                        .frame(width: UIScreen.main.bounds.width-40,height: 42)
+                        .background(Color.appColorBlue)
+                        .cornerRadius(40)
                     
                     
-                }.frame(width: UIScreen.main.bounds.width-40,height: 42)
-                    .background(Color.appColorBlue)
-                    .cornerRadius(40)
-                    .padding(.top,50)
+                }
+                .padding(.top,50)
                 
                 
                 Spacer()
             }
-        }.padding()
-        .navigationTitle("Clear History")
-        .navigationBarTitleDisplayMode(.inline)
-        .background(Color.screenBG)
-        .alert(isPresented: $showAlert) {
-             Alert(title: Text("Clear History?"), message: Text("Are you sure you want to clear history?"), primaryButton: .default(Text("No"), action: {
-                    print("Okay Click")
-                }), secondaryButton: .default(Text("Yes")))
+            
+            
+            if(isLoading){
+                
+                LoadingView()
+                
+            }
+            
+        }.toastView(toast: $toast)
+        .padding()
+            .navigationTitle("Clear History")
+            .navigationBarTitleDisplayMode(.inline)
+            .background(Color.screenBG)
+            .customAlert(isPresented: $showAlert) {
+                
+                CustomAlertView(
+                    showVariable: $showAlert, showTwoButton: true, message: "Are you sure you want to clear history?",
+                    action: {
+                        DispatchQueue.main.async{ [self] in
+                         
+                            clearOneWeekData(olderThanDays: days)
+                            
+                        }
+                    }
+                )
+                
+            }.onChange(of: isCleared, { oldValue, newValue in
+               
+                if(newValue){
+                    
+                    toast = FancyToast(type: .success, title: "Success", message: "History Cleared Successfully")
+                    isCleared = false
+                    
+                }
+                
+            })
+           
+    }
+    
+    func clearOneWeekData(olderThanDays: Int){
+        
+        isLoading  = true
+        isCleared  = false
+        
+        let currentDate = DateUtills.getCurrentDate(format: DateTimeFormats.dateFormat1)
+        
+        let olderDate = Calendar.current.date(byAdding: .day, value: -olderThanDays, to: currentDate)!
+        
+        print("olderDate",olderDate)
+        
+        
+        for cough in coughFetchResult{
+            
+            if let date = cough.date{
+                
+                let coughDate = DateUtills.stringToDate(date: date, dateFormat: DateTimeFormats.dateFormat1)
+                
+                if(coughDate<=currentDate || coughDate>=olderDate){
+                    
+                    do {
+                        PersistenceController.shared.container.viewContext.delete(cough)
+                        try  PersistenceController.shared.container.viewContext.save()
+                        
+                    }catch {
+                        print("cough Error deleting data: \(error.localizedDescription)")
+                    }
+                }
+                
+                
+                
+            }
         }
+        
+        for coughNotes in coughNotesFetchResult{
+            
+            if let date = coughNotes.date{
+                
+                let coughDate = DateUtills.stringToDate(date: date, dateFormat: DateTimeFormats.dateFormat1)
+                
+                if(coughDate<=currentDate || coughDate>=olderDate){
+                    
+                    do {
+                        PersistenceController.shared.container.viewContext.delete(coughNotes)
+                        try  PersistenceController.shared.container.viewContext.save()
+                        
+                    }catch {
+                        print("coughNotes Error deleting data: \(error.localizedDescription)")
+                    }
+                    
+                }
+                
+                
+            }
+        }
+        
+        for hoursUpload in hoursUploadFetchResult{
+            
+            if let date = hoursUpload.dateTime{
+                
+                let d = DateUtills.stringToDate(date: date, dateFormat: DateTimeFormats.dateTimeFormat1)
+                
+                let coughDate = DateUtills.changeDateFormat(date: d, newFormat: DateTimeFormats.dateFormat1)!
+                
+                if(coughDate<=currentDate || coughDate>=olderDate){
+                    
+                    do {
+                        PersistenceController.shared.container.viewContext.delete(hoursUpload)
+                        try  PersistenceController.shared.container.viewContext.save()
+                        
+                    }catch {
+                        print("hoursUpload Error deleting data: \(error.localizedDescription)")
+                    }
+                    
+                }
+                
+                
+            }
+        }
+        
+        for notes in notesFetchResult{
+            
+            if let date = notes.date{
+                
+                let coughDate = DateUtills.stringToDate(date: date, dateFormat: DateTimeFormats.dateFormat1)
+                
+                if(coughDate<=currentDate || coughDate>=olderDate){
+                    
+                    do {
+                        PersistenceController.shared.container.viewContext.delete(notes)
+                        try  PersistenceController.shared.container.viewContext.save()
+                        
+                    }catch {
+                        print("coughNotes Error deleting data: \(error.localizedDescription)")
+                    }
+                    
+                }
+                
+                
+            }
+        }
+        
+        for trackedHour in trackedHourFetchResult{
+            
+            if let date = trackedHour.date{
+                
+                let d = DateUtills.stringToDate(date: date, dateFormat: DateTimeFormats.dateTimeFormat1)
+                
+                let coughDate = DateUtills.changeDateFormat(date: d, newFormat: DateTimeFormats.dateFormat1)!
+                
+                
+                if(coughDate<=currentDate || coughDate>=olderDate){
+                    
+                    do {
+                        PersistenceController.shared.container.viewContext.delete(trackedHour)
+                        try  PersistenceController.shared.container.viewContext.save()
+                        
+                    }catch {
+                        print("coughNotes Error deleting data: \(error.localizedDescription)")
+                    }
+                    
+                }
+                
+                
+            }
+        }
+        
+        
+        for volunteerCough in volunteerCoughFetchResult{
+            
+            if let date = volunteerCough.date{
+                
+                let coughDate = DateUtills.stringToDate(date: date, dateFormat: DateTimeFormats.dateFormat1)
+                
+                if(coughDate<=currentDate || coughDate>=olderDate){
+                    
+                    do {
+                        PersistenceController.shared.container.viewContext.delete(volunteerCough)
+                        try  PersistenceController.shared.container.viewContext.save()
+                        
+                    }catch {
+                        print("coughNotes Error deleting data: \(error.localizedDescription)")
+                    }
+                    
+                }
+                
+                
+            }
+        }
+        
+        isCleared  = true
+        isLoading  = false
     }
 }
 

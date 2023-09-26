@@ -20,7 +20,9 @@ struct SendOtpView: View
     @State var fcmToken: String
     @State var loginWith: String
     
-    
+    @State private var allValunteerCoughList: [VolunteerCough] = []
+    @State private var uploadTrackingHoursList: [HoursUpload] = []
+
     
     var body: some View {
         
@@ -188,7 +190,7 @@ struct SendOtpView: View
         }.environment(\.managedObjectContext,viewContext)
             .navigationDestination(isPresented: $sendOtpVM.goNext, destination: {
                 
-                AllowSyncStatsView(text: "Continue")
+                AllowSyncStatsView(text: "Continue",allValunteerCoughList: $allValunteerCoughList ,uploadTrackingHoursList: $uploadTrackingHoursList)
                     .environment(\.managedObjectContext,viewContext)
                 
                 //                BaselineView()

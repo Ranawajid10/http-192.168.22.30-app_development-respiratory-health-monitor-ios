@@ -227,7 +227,8 @@ struct BecomeVolunteerView: View {
                 
             }
             
-        }.toastView(toast: $toast)
+        }.environment(\.managedObjectContext, viewContext)
+            .toastView(toast: $toast)
             .dismissKeyboardOnTap()
             .navigationTitle("Volunteer Participation")
             .onReceive(becomeVolunteerVM.$isGenderExpended, perform: { i in
@@ -250,7 +251,7 @@ struct BecomeVolunteerView: View {
                     
                 
             })
-            .onChange(of: becomeVolunteerVM.isError){ newValue in
+            .onChange(of: becomeVolunteerVM.isError){ oldValue, newValue in
                 
                 if(newValue){
                     

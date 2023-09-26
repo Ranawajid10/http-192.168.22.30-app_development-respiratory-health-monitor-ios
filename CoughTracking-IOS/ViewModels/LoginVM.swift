@@ -14,18 +14,24 @@ class LoginVM:ObservableObject{
     
     
     @Published var fcmToken: String  = "dL6uAbzuRMutCimTmYq4v9:APA91bGu0MnuzDhpzR-EXyjjlD0OzUuR6i_t8CO1J8Jpi-FQzevV77qCn1Xn9yufLcUaNJ4vsHVzLjANoazk-dq3HmRaJMtfPe_702HeTLXJxnuX-dO5WyOynGSeBVkLFJAmn7LsvRO"
-//    @Published var email: String = ""
-        @Published var email: String = "aftababbas7866@gmail.com"
+    @Published var email: String = ""
+    @Published var socialEmail: String = ""
+    //        @Published var email: String = "aftababbas7866@gmail.com"
+//            @Published var email: String = "sicemep313@htoal.com"
     @Published var errorMessage: String = ""
     
     @Published var isLoading = false
     @Published var isError = false
+    @Published var isSocialLoggedIn = false
+    @Published var underDev = false
     
     @Published var showNoInternetAlert = false
     @Published var navigateToOTP = false
     
     @Published var loginWith = ""
     @Published var idToken = ""
+    
+    let provider = OAuthProvider(providerID: "twitter.com")
     
     
     
@@ -88,6 +94,8 @@ class LoginVM:ObservableObject{
                     
                 }else{
                     
+                    
+                    MyUserDefaults.saveString(forKey:Constants.loginWith, value: loginWith)
                     navigateToOTP = true
                     
                 }
@@ -141,7 +149,7 @@ class LoginVM:ObservableObject{
                 // Get User email if available else return
                 if let userProfile = userData.profile{
                     
-                    email = userProfile.email
+                    socialEmail = userProfile.email
                     
                 }else{
                     
@@ -179,34 +187,51 @@ class LoginVM:ObservableObject{
     
     func twitterlogin(){
         
-        print("rer")
+        isLoading = true
         
-        let provider = OAuthProvider(providerID: "twitter.com")
-        
-        provider.customParameters = [
-            "lang": "en"
-        ]
-        
-        
-        provider.getCredentialWith(nil) { credential, error in
+        provider.getCredentialWith(nil) { [self] credential, error in
+            
+            
             if error != nil {
-                // Handle error.
-                print("rerr",error?.localizedDescription)
+                errorMessage  = error?.localizedDescription ?? ""
+                isError = true
             }
-            if credential != nil {
-//                Auth.auth().signIn(with: credential) { authResult, error in
-//                    if error != nil {
-//                        // Handle error.
-//                    }
-//                    // User is signed in.
-//                    // IdP data available in authResult.additionalUserInfo.profile.
-//                    // Twitter OAuth access token can also be retrieved by:
-//                    // (authResult.credential as? OAuthCredential)?.accessToken
-//                    // Twitter OAuth ID token can be retrieved by calling:
-//                    // (authResult.credential as? OAuthCredential)?.idToken
-//                    // Twitter OAuth secret can be retrieved by calling:
-//                    // (authResult.credential as? OAuthCredential)?.secret
-//                }
+            
+            
+            if let credential = credential {
+                Auth.auth().signIn(with: credential) { [self] authResult, error in
+                    if let error = error {
+                        errorMessage = error.localizedDescription
+                        isError = true
+                        return;
+                    }
+                    
+                    let currentUser = Auth.auth().currentUser
+                    currentUser?.getIDTokenForcingRefresh(true) { [self] idToken, error in
+                      if let error = error {
+                          errorMessage = error.localizedDescription
+                          isError = true
+                        return;
+                      }
+                        
+                        if let idToken = idToken {
+                            
+                            self.idToken = idToken
+                            self.email = currentUser?.email ?? ""
+                            
+                            print("idToken",idToken,"----email",self.email)
+                            
+                            self.doSocialLogin()
+                            
+                        }else{
+                            
+                            errorMessage = "Faild to get token, Please try again"
+                            isError = true
+                            
+                        }
+                    }
+                    
+                }
             }
         }
         
@@ -234,10 +259,36 @@ class LoginVM:ObservableObject{
     
     func doSocialLogin(){
         
-        
-        
-        ApiClient.shared.socialLogin(loginWith:loginWith,email:email,idToken:idToken,fcmToken:fcmToken){ response in
+        ApiClient.shared.socialLogin(loginWith:loginWith,email:socialEmail,idToken:idToken,fcmToken:fcmToken){ [self] response in
             
+            isLoading = false
+            
+            switch response {
+            case .success(let success):
+                
+                if(success.statusCode==nil && (success.token != nil) && !(success.detail != nil)){
+                    
+                    isError = true
+                    errorMessage = success.detail ?? ""
+                    
+                }else if(success.statusCode == 201 || success.statusCode == 200){
+                    
+                    
+                    
+                    MyUserDefaults.saveUserData(value: success)
+                    MyUserDefaults.saveBool(forKey:Constants.isLoggedIn, value: true)
+                    MyUserDefaults.saveBool(forKey:Constants.isBaseLineSet, value: false)
+                    MyUserDefaults.saveBool(forKey:Constants.isAllowSync, value: false)
+                    MyUserDefaults.saveString(forKey:Constants.loginWith, value: loginWith)
+                    
+                    isSocialLoggedIn = true
+                    
+                }
+                
+            case .failure(let failure):
+                errorMessage = failure.localizedDescription
+                isError =  true
+            }
             
         }
         

@@ -12,7 +12,7 @@ struct MyProfileView: View {
     
     
     
-    @ObservedObject var myProfileVM = MyProfileVM()
+    @StateObject var myProfileVM = MyProfileVM()
     @State private var toast: FancyToast? = nil
     
     
@@ -21,7 +21,7 @@ struct MyProfileView: View {
         
         ZStack {
             
-            ScrollView {
+            ScrollView(showsIndicators: false) {
                 
                 VStack {
                     
@@ -36,9 +36,9 @@ struct MyProfileView: View {
                                 .cornerRadius(60)
                             
                         }
-                            .frame(width: 100,height: 100)
-                            .background(Color.appColorBlue)
-                            .cornerRadius(60)
+                        .frame(width: 100,height: 100)
+                        .background(Color.appColorBlue)
+                        .cornerRadius(60)
                         
                     }else if let image = myProfileVM.selectedImage {
                         
@@ -62,7 +62,6 @@ struct MyProfileView: View {
                         
                         if(myProfileVM.isEditAble){
                             
-                            //
                             myProfileVM.showChoseSheet.toggle()
                             
                         }else{
@@ -207,7 +206,7 @@ struct MyProfileView: View {
             
         }.toastView(toast: $toast)
             .background(Color.screenBG)
-            .onChange(of: myProfileVM.isError){ newValue in
+            .onChange(of: myProfileVM.isError){ oldValue, newValue in
                 
                 if(newValue){
                     
@@ -223,7 +222,7 @@ struct MyProfileView: View {
                     .presentationCornerRadius(35)
                 
             }
-            .onChange(of: myProfileVM.isUpdated){ newValue in
+            .onChange(of: myProfileVM.isUpdated){ oldValue, newValue in
                 
                 if(newValue){
                     
@@ -324,7 +323,9 @@ struct ChoseImageSheet:View{
             
             Spacer()
             
-        }.padding(.top)
+        }.navigationTitle("Profile")
+            .navigationBarTitleDisplayMode(.inline)
+        .padding(.top)
             .padding(.horizontal)
             .background(Color.screenBG)
             .sheet(isPresented: $showSheet){

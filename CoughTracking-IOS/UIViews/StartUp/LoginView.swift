@@ -11,16 +11,15 @@ struct LoginView: View
 {
     
     @Environment(\.managedObjectContext) private var viewContext
-    @State private var showPasswordError: Bool = false
+    
     @ObservedObject var loginVM = LoginVM()
     
     @State private var toast: FancyToast? = nil
     
-    @State private var isOtpView = false
     
-    @State private var isfacebook = false
-    @State private var isgoogle = false
-    @State private var istwitter = false
+    @State private var allValunteerCoughList: [VolunteerCough] = []
+    @State private var uploadTrackingHoursList: [HoursUpload] = []
+
     
     
     var body: some View {
@@ -40,7 +39,7 @@ struct LoginView: View
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(height: 130)
-                        .padding(.top, 50)
+                        .padding(.top, 30)
                     
                     TextField("Enter email", text: $loginVM.email)
                         .keyboardType(.emailAddress)
@@ -69,7 +68,7 @@ struct LoginView: View
                         
                         
                     }
-                    .padding(.top, 50)
+                    .padding(.top, 30)
                     
                     Image("or_proceed_with_text")
                         .resizable()
@@ -95,8 +94,9 @@ struct LoginView: View
                         
                         Button(action: {
                             
-                            loginVM.loginWith = Constants.facebook
-                            loginVM.checkLogin()
+                            loginVM.underDev.toggle()
+//                            loginVM.loginWith = Constants.facebook
+//                            loginVM.checkLogin()
                             
                         }) {
                             Image("facebook_img")
@@ -104,7 +104,6 @@ struct LoginView: View
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 100, height:40)
                         }
-                        
                         
                         Button {
                             
@@ -136,10 +135,17 @@ struct LoginView: View
             
         }.navigationTitle("")
         .toastView(toast: $toast)
+        .dismissKeyboardOnTap()
             .environment(\.managedObjectContext,viewContext)
             .navigationDestination(isPresented: $loginVM.navigateToOTP, destination: {
                 
                 SendOtpView(email: loginVM.email, fcmToken: loginVM.fcmToken, loginWith: loginVM.loginWith)
+                    .environment(\.managedObjectContext,viewContext)
+                
+            })
+            .navigationDestination(isPresented: $loginVM.isSocialLoggedIn, destination: {
+                
+                AllowSyncStatsView(text: "Continue",allValunteerCoughList: $allValunteerCoughList ,uploadTrackingHoursList: $uploadTrackingHoursList)
                     .environment(\.managedObjectContext,viewContext)
                 
             })
@@ -153,7 +159,16 @@ struct LoginView: View
                     
                 }
                 
-            }).dismissKeyboardOnTap()
+            })
+            .onReceive(loginVM.$isSocialLoggedIn, perform: { i in
+                
+                if(i){
+                    
+                    
+                    
+                }
+                
+            })
             .customAlert(isPresented: $loginVM.showNoInternetAlert) {
                 
                 NoInternetAlertView{
@@ -161,6 +176,15 @@ struct LoginView: View
                     loginVM.checkLogin()
                     
                 }
+                
+            }.customAlert(isPresented: $loginVM.underDev) {
+                
+                CustomAlertView(
+                    showVariable: $loginVM.underDev, showTwoButton: false, message: "Feature Under Development",
+                    action: {
+                        print("Okay Clicked")
+                    }
+                )
                 
             }
             
@@ -188,27 +212,7 @@ struct LoginView: View
         //            }
     }
     
-    func loginWithGoogle() {
-        // Implement Google login logic using the Google SDK
-        // Example: Use GoogleSignInButton to initiate Google sign-in flow
-        //GIDSignIn.sharedInstance().signIn()
-        print("Google")
-    }
-    
-    func loginWithTwitter() {
-        print("Twitter")
-        // Implement Twitter login logic using the Twitter SDK
-        // Example: Use TWTRTwitter.sharedInstance().logIn to initiate Twitter login flow
-        //            TWTRTwitter.sharedInstance().logIn { session, error in
-        //                if let session = session {
-        //                    // Handle successful Twitter login
-        //                    print("Twitter login success. User name: \(session.userName)")
-        //                } else if let error = error {
-        //                    // Handle login error
-        //                    print("Twitter login error: \(error.localizedDescription)")
-        //                }
-        //            }
-    }
+  
     
     
 }

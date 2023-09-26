@@ -65,11 +65,14 @@ class BaselineVM:ObservableObject{
                     
                 }else if(success.statusCode == 201 || success.statusCode == 200){
                     
+                  
                     //Logged In Successfully
                     MyUserDefaults.saveUserData(value: success)
                     MyUserDefaults.saveFloat(forKey: Constants.baseLineLoudness, value: maxLoudness)
                     MyUserDefaults.saveBool(forKey:Constants.isBaseLineSet, value: true)
                     MyUserDefaults.saveBool(forKey: Constants.isFirstSync, value: true)
+                    
+                  
                     isError = false
                     goNext = true
                     
@@ -269,18 +272,20 @@ class BaselineVM:ObservableObject{
             let x = Array(UnsafeBufferPointer(start: buffer!.floatChannelData?[0], count: Int(frameCount)))
             let fs = Float(audioFile.fileFormat.sampleRate)
             
-            
+          
             (segments, _) = PythonFunctions.coughSegmentInference(audioData: x, fs: fs ,buffer:buffer!)
             
             
             if(segments.count > 0){
                 
                 maxLoudness = loudnessBasedAdaptive(segments: segments, buffer: buffer! )
+//                maxLoudness = -16.0000
+                print("maxLoudness",maxLoudness)
                 gotSample = true
                 
             }else{
                 
-                print("elseo")
+                
                 errorMessage = "No cough found, Cough Louder Please!"
                 gotSample = false
                 isError = true

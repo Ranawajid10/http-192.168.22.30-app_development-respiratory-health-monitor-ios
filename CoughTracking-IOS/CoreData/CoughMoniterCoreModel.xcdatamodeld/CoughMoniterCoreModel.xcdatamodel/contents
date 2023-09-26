@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21754" systemVersion="22G91" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22222" systemVersion="23A344" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Cough" representedClassName="Cough" syncable="YES" codeGenerationType="class">
         <attribute name="coughPower" optional="YES" attributeType="String"/>
         <attribute name="coughSegments" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[[Float]]"/>
@@ -12,11 +12,31 @@
         <attribute name="createdOn" optional="YES" attributeType="String"/>
         <attribute name="uid" optional="YES" attributeType="String"/>
     </entity>
-    <entity name="CoughTrackingHours" representedClassName="CoughTrackingHours" syncable="YES" codeGenerationType="class">
+    <entity name="CoughNotes" representedClassName="CoughNotes" syncable="YES" codeGenerationType="class">
+        <attribute name="coughPower" optional="YES" attributeType="String"/>
+        <attribute name="coughSegments" optional="YES" attributeType="Transformable" valueTransformerName="MyCustomTransformer" customClassName="[[Float]]"/>
         <attribute name="date" optional="YES" attributeType="String"/>
-        <attribute name="secondsTrack" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="time" optional="YES" attributeType="String"/>
+        <attribute name="url" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="HoursUpload" representedClassName="HoursUpload" syncable="YES" codeGenerationType="class">
+        <attribute name="dateTime" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="trackedSeconds" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
     </entity>
     <entity name="Notes" representedClassName="Notes" syncable="YES" codeGenerationType="class">
+        <attribute name="date" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="note" optional="YES" attributeType="String"/>
+        <attribute name="time" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="TrackedHours" representedClassName="TrackedHours" syncable="YES" codeGenerationType="class">
+        <attribute name="date" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="secondsTrack" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="UploadNotes" representedClassName="UploadNotes" syncable="YES" codeGenerationType="class">
         <attribute name="date" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="String"/>
         <attribute name="note" optional="YES" attributeType="String"/>

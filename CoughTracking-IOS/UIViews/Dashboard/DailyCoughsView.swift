@@ -12,46 +12,35 @@ struct DailyCoughsView: View {
     
     @ObservedObject var dashboardVM:DashboardVM
     @Binding var allCoughList:[Cough]
-    @Binding var hourTrackedList:[CoughTrackingHours]
+    @Binding var hourTrackedList:[TrackedHours]
     
-    var array = ["00:00", "02:00", "04:00", "06:00", "08:00", "10:00",
-                 "12:00", "14:00", "16:00", "18:00", "20:00", "23:00"]
-    
-    @State var totalCoughCount:Int = 0
-    @State var totalTrackedHours:Double = 0.0
-    @State var coughsPerHour:Int = 0
+    @StateObject var dailyCoughVM = DailyCoughVM()
     
     
-    @State private var selectedDate = Date()
-    
-    @State var moderateTimeData: [String: Int] = [:]
-    @State var severeTimeData: [String: Int] = [:]
-    
-    @State var sortedModerateTimeDataDictionary: [(key: String, value: Int)]  = []
-    @State var sortedSevereTimeDataDictionary: [(key: String, value: Int)] = []
-    
-    @State var changeGraph:Int = 0
-    
-    @State var userData = LoginResult()
     @Environment(\.managedObjectContext) private var viewContext
+    
+    
+    
+    @State private var toast: FancyToast? = nil
     
     var body: some View {
         ZStack {
-            ScrollView {
+            
+            ScrollView(showsIndicators: false) {
                 VStack {
                     
                     
-                    DaySelectionView(selectedDate: $selectedDate)
+                    DailyDaySelectionView(dailyCoughVM: dailyCoughVM)
                     
-                    HourlyReportView(totalCoughCount: $totalCoughCount, totalTrackedHours: $totalTrackedHours, coughsPerHour: $coughsPerHour)
+                    HourlyReportView(totalCoughCount: $dailyCoughVM.totalCoughCount, totalTrackedHours: $dailyCoughVM.totalTrackedHours, coughsPerHour: $dailyCoughVM.coughsPerHour)
                     
                     
                     HourlyCoughGraph()
                     
                     
-                    DailyGraphView(moderateCoughData: $sortedModerateTimeDataDictionary, severeCoughData: $sortedSevereTimeDataDictionary)
+                    DailyGraphView(moderateCoughData: $dailyCoughVM.sortedModerateTimeDataDictionary, severeCoughData: $dailyCoughVM.sortedSevereTimeDataDictionary)
                         .frame(height: 350)
-                        .id(changeGraph)
+                        .id(dailyCoughVM.changeGraph)
                     
                     
                     //            Color.white
@@ -69,7 +58,7 @@ struct DailyCoughsView: View {
                         
                     }
                     
-                    if(MyUserDefaults.getBool(forKey: Constants.isAutoDonate)){
+                    if(!MyUserDefaults.getBool(forKey: Constants.isAutoDonate)){
                         HStack{
                             
                             Image("help")
@@ -96,28 +85,9 @@ struct DailyCoughsView: View {
                         
                         NavigationLink {
                             
-                            if(userData.age==nil && userData.gender==nil && userData.ethnicity==nil){
-                                
-                                BecomeVolunteerView(dashboardVM: dashboardVM,allCoughList: $allCoughList)
-                                    .environment(\.managedObjectContext, viewContext)
-                                
-                            }else{
-                                
-                                VolunteerParticipationView(dashboardVM: dashboardVM)
-                                    .environment(\.managedObjectContext, viewContext)
-//                                    .onAppear{
-//                                        
-//                                        dashboardVM.stopRecording()
-//                                        
-//                                    }.onDisappear{
-//                                        
-//                                        if(!MyUserDefaults.getBool(forKey: Constants.isMicStopbyUser)){
-//                                            dashboardVM.startRecording()
-//                                        }
-//                                        
-//                                    }
-                                
-                            }
+                            AllowSyncStatsView(text: "Save",allValunteerCoughList: $dashboardVM.valunteerCoughList ,uploadTrackingHoursList: $dashboardVM.uploadTrackingHoursList)
+                                .environment(\.managedObjectContext, viewContext)
+                            
                             
                         } label: {
                             
@@ -140,213 +110,140 @@ struct DailyCoughsView: View {
                     
                 }
             }
-        }.onChange(of: selectedDate, perform: { newValue in
             
-            getGraphData()
             
-        }).onAppear{
             
-            userData = MyUserDefaults.getUserData() ?? LoginResult()
-            getGraphData()
-            
-        }.onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextObjectsDidChange)) { _ in
-            
-            getGraphData()
-            
-        }
-    }
-    
-    func calculateCurrentCoughHours(){
-        
-        totalTrackedHours = 0
-        coughsPerHour = 0
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        
-        
-        let dateString = dateFormatter.string(from: selectedDate)
-        
-        var totalSeconds = 0.0
-        
-        for second in hourTrackedList {
-            
-            if(dateString == second.date){
+        }.toastView(toast: $toast)
+            .onReceive(dailyCoughVM.$isError, perform:  { i in
                 
-                totalSeconds+=second.secondsTrack
-                
-            }
-            
-        }
-        
-        
-        let hours =  totalSeconds/3600.0
-      
-        
-        if(hours<1){
-            
-            totalTrackedHours = 1
-            
-        }else{
-            
-            totalTrackedHours =  totalSeconds/3600.0
-            
-        }
-        
-        
-//        totalTrackedHours = totalSeconds/3600.0
-        
-//        if(totalTrackedHours > 1 && coughsPerHour > 1){
-
-//            print("coughsPerHour","1")
-            coughsPerHour = totalCoughCount / Int(totalTrackedHours)
-
-//        }else{
-//
-//            print("coughsPerHour","2")
-//            coughsPerHour = 0
-//
-//        }
-    }
-    
-    func getGraphData(){
-        
-        let (currentDateCoughs,times) = getCurrentDayCoughs()
-        calculateCurrentCoughHours()
-        
-        totalCoughCount = currentDateCoughs.count
-        
-        moderateTimeData.removeAll()
-        severeTimeData.removeAll()
-        
-        
-        for hour in array {
-            moderateTimeData[hour, default: 0] = 0
-            severeTimeData[hour, default: 0] = 0
-        }
-        
-        
-        
-        for cough in currentDateCoughs {
-            guard let coughTime = cough.time else {
-                continue
-            }
-            
-            print("coughTime",coughTime)
-            // Extract the minutes part from the cough time (e.g., "11:42:54" -> "42")
-            let minutes = coughTime.dropLast(6)
-            
-            
-            print("minutes",minutes)
-            
-            // Initialize variables to track whether the cough time falls within an interval
-            var isWithinInterval = false
-            var mainIndex = ""
-            
-            for (index, interval) in array.enumerated() {
-                if index < array.count - 1 {
-                    // Extract start and end minutes of the interval
-                    let startMinutes = interval.dropLast(3)
-                    let endMinutes = array[index + 1].dropLast(3)
-                    //
-                    //
-                    //                    print("startMinutes",startMinutes,"------ endMinutes",endMinutes)
+                if(i){
                     
-                    if minutes >= startMinutes && minutes < endMinutes {
-                        isWithinInterval = true
-                        mainIndex = array[index + 1]
-                        break
-                    }
+                    toast = FancyToast(type: .error, title: "Error occurred!", message: dailyCoughVM.errorMessage)
+                    dailyCoughVM.isError = false
+                    
                 }
-            }
-            
-            if isWithinInterval {
-                let coughType = cough.coughPower
                 
-                if coughType == "moderate" {
-                    moderateTimeData[mainIndex, default: 0] += 1
-                } else if coughType == "severe" {
-                    severeTimeData[mainIndex, default: 0] += 1
-                }
+                
+            }).onAppear{
+                
+                
+                dailyCoughVM.allCoughList.removeAll()
+                dailyCoughVM.hourTrackedList.removeAll()
+                
+                dailyCoughVM.allCoughList = allCoughList
+                dailyCoughVM.hourTrackedList = hourTrackedList
+                
+                dailyCoughVM.userData = MyUserDefaults.getUserData() ?? LoginResult()
+                
+                dailyCoughVM.getGraphData()
+                
+            }.onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextObjectsDidChange)) { _ in
+                
+                dailyCoughVM.allCoughList.removeAll()
+                dailyCoughVM.hourTrackedList.removeAll()
+                
+                dailyCoughVM.allCoughList = allCoughList
+                dailyCoughVM.hourTrackedList = hourTrackedList
+                
+                dailyCoughVM.getGraphData()
+                
             }
-        }
-        
-        
-        // Create a new dictionary with sorted keys and their corresponding values
-        sortedModerateTimeDataDictionary.removeAll()
-        sortedSevereTimeDataDictionary.removeAll()
-        
-        let moderateList = moderateTimeData.sorted { v1, v2 in
-            
-            let a = v1.key.dropLast(3)
-            let b = v2.key.dropLast(3)
-            
-            return a < b
-        }
-        
-        sortedModerateTimeDataDictionary = moderateList
-        
-        
-        let severeList = severeTimeData.sorted { v1, v2 in
-            
-            let a = v1.key.dropLast(3)
-            let b = v2.key.dropLast(3)
-            
-            return a < b
-        }
-        
-        sortedSevereTimeDataDictionary = severeList
-        
-        //        withAnimation {
-        
-        changeGraph+=1
-        
-        //        }
-        
-        
-        print("Daily Graph Data",currentDateCoughs.count,"---",times.count,"---Moderate---",sortedModerateTimeDataDictionary,"---Severe---",sortedSevereTimeDataDictionary)
-        
-        
     }
     
-    func getCurrentDayCoughs() -> ([Cough],[String]){
-        
-        var currentDateCoughsList:[Cough] = []
-        
-        var coughTimes: [String] = []
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        
-        
-        let dateString = dateFormatter.string(from: selectedDate)
-        
-        
-        for cough in allCoughList {
-            
-            if cough.date == dateString {
-                
-                
-                
-                let coughTime = cough.time?.components(separatedBy: ":").first ?? ""
-                
-                
-                coughTimes.append(coughTime)
-                currentDateCoughsList.append(cough)
-                
-                
-            }
-            
-            
-            
-        }
-        
-        
-        return (currentDateCoughsList,coughTimes)
-    }
     
     
 }
+
+
+struct DailyDaySelectionView: View {
+    
+    @ObservedObject var dailyCoughVM:DailyCoughVM
+    
+    var dateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return formatter
+    }
+    
+    
+    var body: some View {
+        HStack {
+            
+            
+            Button {
+                
+                withAnimation {
+                    
+                    if(!dailyCoughVM.isLoading){
+                        dailyCoughVM.previous()
+                    }
+                    
+                }
+                
+            } label: {
+                
+                if(dailyCoughVM.isLoading && dailyCoughVM.loaderPos == 1){
+                    
+                    ProgressView()
+                        .tint(Color.black)
+                    
+                }else{
+                    
+                    Image(systemName: "chevron.backward")
+                        .foregroundColor(Color.black)
+                    
+                }
+                
+            }.frame(width: 20,height: 20)
+            
+            
+            Spacer()
+            
+            Text(dailyCoughVM.isToday(dailyCoughVM.selectedDate) ? "Today" : dateFormatter.string(from:dailyCoughVM.selectedDate))
+            
+            
+            Spacer()
+            
+            Button {
+                
+                withAnimation {
+                    
+                    if(!dailyCoughVM.isLoading){
+                        
+                        dailyCoughVM.next()
+                        
+                    }
+                    
+                }
+                
+            } label: {
+                
+                if(dailyCoughVM.isLoading && dailyCoughVM.loaderPos == 0){
+                    
+                    ProgressView()
+                        .tint(Color.black)
+                    
+                }else{
+                    
+                    Image(systemName: "chevron.forward")
+                        .foregroundColor(Color.black)
+                    
+                }
+                
+            }.frame(width: 20,height: 20)
+                .disabled(Calendar.current.isDateInTomorrow(dailyCoughVM.selectedDate))
+            
+        }
+        .padding(.horizontal, 32)
+    }
+    
+    
+    
+}
+
+
+
 
 struct DailyGraphView: UIViewRepresentable {
     

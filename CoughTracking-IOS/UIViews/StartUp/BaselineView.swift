@@ -111,9 +111,17 @@ struct BaselineView: View
                         
                         Button {
                             
-                            if(baselineVM.gotSample){
+                            if(baselineVM.gotSample && MyUserDefaults.getString(forKey: Constants.loginWith) == Constants.simple){
                                 
                                 baselineVM.doLogin()
+                                
+                            }else if(MyUserDefaults.getString(forKey: Constants.loginWith) == Constants.google || MyUserDefaults.getString(forKey: Constants.loginWith) == Constants.twitter){
+                             
+                                MyUserDefaults.saveFloat(forKey: Constants.baseLineLoudness, value: baselineVM.maxLoudness)
+                                MyUserDefaults.saveBool(forKey:Constants.isBaseLineSet, value: true)
+                                MyUserDefaults.saveBool(forKey: Constants.isFirstSync, value: true)
+                                
+                                baselineVM.goNext = true
                                 
                             }else{
                                 

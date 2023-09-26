@@ -10,7 +10,7 @@ import CoreData
 
 struct ProfileSettingsView: View {
     
-    @StateObject var dashboardVM:DashboardVM
+    @ObservedObject var dashboardVM:DashboardVM
     @Environment(\.managedObjectContext) private var viewContext
     @State var isSyncData = false
     @State var showAlert = false
@@ -18,7 +18,8 @@ struct ProfileSettingsView: View {
     @State var showLogout = false
     @State var showNotification = false
     @State var goGetStarted = false
-    @State var isLoading = false
+    
+    @StateObject var profileSettingsVM = ProfileSettingsVM()
     
     var body: some View {
         ZStack {
@@ -47,31 +48,32 @@ struct ProfileSettingsView: View {
                     }
                     
                     
-                    Button {
-                        
-                        showAlert.toggle()
-                        showNotification.toggle()
-                        
-                    } label: {
-                        
-                        HStack{
-                            
-                            Image("bell")
-                            
-                            Text("Notifications")
-                                .modifier(LatoFontModifier(fontWeight: .regular, fontSize: 16))
-                                .foregroundColor(.black)
-                            
-                            Spacer()
-                            
-                            
-                        }
-                    }.padding(.top)
+//                    Button {
+//                        
+//                        showAlert.toggle()
+//                        showNotification.toggle()
+//                        
+//                    } label: {
+//                        
+//                        HStack{
+//                            
+//                            Image("bell")
+//                            
+//                            Text("Notifications")
+//                                .modifier(LatoFontModifier(fontWeight: .regular, fontSize: 16))
+//                                .foregroundColor(.black)
+//                            
+//                            Spacer()
+//                            
+//                            
+//                        }
+//                    }.padding(.top)
                     
                     
                     NavigationLink {
                         
                         ClearHistoryView()
+                            .environment(\.managedObjectContext,viewContext)
                         
                     } label: {
                         
@@ -92,7 +94,8 @@ struct ProfileSettingsView: View {
                     
                     NavigationLink {
                         
-                        AllowSyncStatsView(text: "Save")
+                        AllowSyncStatsView(text: "Save",allValunteerCoughList: $dashboardVM.valunteerCoughList ,uploadTrackingHoursList: $dashboardVM.uploadTrackingHoursList)
+                            .environment(\.managedObjectContext,viewContext)
                         
                     } label: {
                         
@@ -170,7 +173,7 @@ struct ProfileSettingsView: View {
                 }.padding()
             }
             
-            if(isLoading){
+            if(profileSettingsVM.isLoading){
                 
                 LoadingView()
                 
@@ -181,7 +184,7 @@ struct ProfileSettingsView: View {
             .customAlert(isPresented: $showNotification) {
                 
                 CustomAlertView(
-                    showVariable: $showNotification, message: "Feature Under Development",
+                    showVariable: $showNotification, showTwoButton: false, message: "Feature Under Development",
                     action: {
                         print("Okay Clicked")
                     }
@@ -191,9 +194,9 @@ struct ProfileSettingsView: View {
             .customAlert(isPresented: $showConfirmDeleteAccount) {
                 
                 CustomAlertView(
-                    showVariable: $showConfirmDeleteAccount, message: "Do you want to delete this account?",
+                    showVariable: $showConfirmDeleteAccount, showTwoButton: true, message: "Do you want to delete this account?",
                     action: {
-                        print("Okay Clicked")
+                        profileSettingsVM.deleteAccount()
                     }
                 )
                 
@@ -201,7 +204,7 @@ struct ProfileSettingsView: View {
             .customAlert(isPresented: $showLogout) {
                 
                 CustomAlertView(
-                    showVariable: $showLogout, message: "Are you sure you want to signout?",
+                    showVariable: $showLogout, showTwoButton: true, message: "Are you sure you want to signout?",
                     action: {
                         
                         doSignOut()
@@ -214,11 +217,15 @@ struct ProfileSettingsView: View {
                 SplashView()
                     .environment(\.managedObjectContext,viewContext)
                 
-            }.onAppear{
+            }.onReceive(profileSettingsVM.$isDeleted, perform:  { i in
                 
-                print(dashboardVM.counter)
+                if(i){
+                    
+                    doSignOut()
+                    
+                }
                 
-            }
+            })
         
     }
     
@@ -234,7 +241,7 @@ struct ProfileSettingsView: View {
             
         }
         
-        isLoading = true
+        profileSettingsVM.isLoading = true
         goGetStarted = false
         
         MyUserDefaults.saveBool(forKey: Constants.isLoggedIn, value: false)
@@ -255,9 +262,11 @@ struct ProfileSettingsView: View {
 //        deleteBaseLinehData()
         deleteVolunteer()
         deleteTrackedHour()
+        deleteUploaddHour()
+        deleteCoughNotes()
         
         
-        isLoading = false
+        profileSettingsVM.isLoading = false
         goGetStarted = true
         
     }
@@ -304,7 +313,7 @@ struct ProfileSettingsView: View {
     
     func deleteTrackedHour() {
         
-        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "CoughTrackingHours")
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "TrackedHours")
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         
         do {
@@ -315,11 +324,37 @@ struct ProfileSettingsView: View {
         }
     }
     
+    func deleteUploaddHour() {
+        
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "HoursUpload")
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        
+        do {
+            try viewContext.execute(deleteRequest)
+            try viewContext.save()
+        } catch {
+            print("Error deleting data: \(error)")
+        }
+    }
+    
+    func deleteCoughNotes() {
+        
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "CoughNotes")
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        
+        do {
+            try viewContext.execute(deleteRequest)
+            try viewContext.save()
+        } catch {
+            print("Error deleting data: \(error)")
+        }
+    }
     
 }
 
 struct CustomAlertView: View {
     @Binding var showVariable:Bool
+    var showTwoButton:Bool
     var message: String
     var action: () -> Void
     
@@ -334,24 +369,27 @@ struct CustomAlertView: View {
             
             HStack(spacing: 20){
                 
-                Button {
+                if(showTwoButton){
+                    Button {
+                        
+                        showVariable.toggle()
+                        
+                    } label: {
+                        
+                        
+                        Text("No")
+                            .font(.system(size: 16))
+                            .foregroundColor(Color.black)
+                        
+                        
+                    }.frame(width: 70,height: 42)
+                        .background(Color.white)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 40)
+                                .stroke(Color.black, lineWidth: 2)
+                        )
                     
-                    showVariable.toggle()
-                    
-                } label: {
-                    
-                    
-                    Text("No")
-                        .font(.system(size: 16))
-                        .foregroundColor(Color.black)
-                    
-                    
-                }.frame(width: 70,height: 42)
-                    .background(Color.white)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 40)
-                            .stroke(Color.appColorBlue, lineWidth: 2)
-                    )
+                }
                 
                 
                 
@@ -363,7 +401,7 @@ struct CustomAlertView: View {
                 } label: {
                     
                     
-                    Text("Yes")
+                    Text(showTwoButton ? "Yes" : "Okay")
                         .font(.system(size: 16))
                         .foregroundColor(Color.white)
                     
@@ -373,10 +411,10 @@ struct CustomAlertView: View {
                     .cornerRadius(40)
                 
                 
-            }.padding(.vertical)
+            }.padding(.vertical,32)
             
         }
-        .frame(width: UIScreen.main.bounds.width-100)
+        .frame(width: UIScreen.main.bounds.width-50)
         .background(Color.white)
         .cornerRadius(20)
         .shadow(radius: 10)

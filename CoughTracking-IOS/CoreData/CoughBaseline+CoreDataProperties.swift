@@ -2,7 +2,7 @@
 //  CoughBaseline+CoreDataProperties.swift
 //  
 //
-//  Created by Ali Rizwan on 25/09/2023.
+//  Created by Ali Rizwan on 27/09/2023.
 //
 //
 
@@ -16,8 +16,8 @@ extension CoughBaseline {
         return NSFetchRequest<CoughBaseline>(entityName: "CoughBaseline")
     }
 
+    @NSManaged public var coughSegments: [[Float]]?
     @NSManaged public var createdOn: String?
     @NSManaged public var uid: String?
-    @NSManaged public var coughSegments: [[Float]]?
 
 }
